@@ -1,58 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# KnowBase
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D%208.2-777bb4.svg)](https://www.php.net/)
+[![Laravel Version](https://img.shields.io/badge/laravel-%3E%3D%2011.0-ff2d20.svg)](https://laravel.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-## About Laravel
+**KnowBase** is a premium, modern academic knowledge-sharing platform and gamified discussion ecosystem built for students. Students can ask questions, write insightful articles, create community discussion threads, follow other users, and unlock badges for their contributions.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🌟 Key Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Interactive Q&A System
+- Ask academic questions classified by school levels (Middle School, High School, College, etc.).
+- Mark the best response as the **Brainliest Answer** to award extra reputation points.
+- Upvote/downvote posts with real-time reputation adjustments (+10 for upvotes, -2 for downvotes).
 
-## Learning Laravel
+### 2. Discussion Forums & Articles
+- Write community articles featuring dynamic topic-relevant cover thumbnails.
+- Create multi-category forum threads with full Markdown and rich text support using the customized **Trix Rich Text Editor**.
+- Clean, outlines-based editor toolbar styling with Lucide icons.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3. Social Network & Follow System
+- Follow/unfollow other students to build a learning network.
+- Dynamic profile tabs rendering followers and following grids with avatars, usernames, and mini-stats.
+- Real-time database notifications sent to users when they get followed.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 4. Gamified Badges & Daily Trivia
+- Complete the **Daily Trivia Challenge** (academic trivia queried from the Open Trivia DB API) to earn **+5 XP (Reputation)** on correct answers.
+- Automated milestones system that grants emojis-styled badges (e.g. `First Post` 📝, `Answer Machine` ⚡, `Expert` 🏆) as students participate.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 5. Premium Admin & Moderation Panel
+- **Overview Dashboard**: Displays live metrics (Total Registered, Staff Count, Suspended Members).
+- **User Moderation**: Review student profiles, change roles (Member, Moderator, Admin), or suspend accounts.
+- **Badge Management**: Create custom badges, set criteria targets (Reputation, Articles, Answers), and select emoji icons.
+- **Topics & Tags Management**: Manage standard content categories and tags in card-based interfaces.
 
-## Agentic Development
+### 6. High-Fidelity UI/UX Design
+- **Grayscale Theme**: Premium slate-bordered aesthetic featuring circular avatars and squircle panels (`1.5rem` radius).
+- **Smooth Transitions**: Staggered entrance blur-in animations and global page transitions.
+- **Typewriter Hero**: Animated hero text with character backspacing and typewriter effects, guarded against layout shifts.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
+## 🛠️ Tech Stack
+
+- **Framework**: [Laravel 11](https://laravel.com/)
+- **Frontend Compiler**: [Vite](https://vite.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Interactions**: [Alpine.js](https://alpinejs.dev/)
+- **Rich Text Editor**: [Trix Editor](https://trix-editor.org/)
+- **Testing**: [PHPUnit](https://phpunit.de/)
+
+---
+
+## 🚀 Installation & Setup
+
+Follow these steps to run the project locally:
+
+### Prerequisites
+- PHP $\ge$ 8.2
+- Composer
+- Node.js & npm
+
+### Setup Steps
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Tejas-v-krishna/KnowBase.git
+   cd KnowBase
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Configure the environment:**
+   Copy the example environment file and configure your database settings (defaults to SQLite/MySQL):
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Run migrations and seed the database:**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+5. **Build/Compile front-end assets:**
+   ```bash
+   # Development hot-reload compiler
+   npm run dev
+
+   # Production bundle compiler
+   npm run build
+   ```
+
+6. **Start the local server:**
+   ```bash
+   php artisan serve
+   ```
+   Visit the app at `http://127.0.0.1:8000`.
+
+---
+
+## 🧪 Testing
+
+Run the automated test suite containing 34 feature and unit tests (covering user following, question voting, reputation flows, and registration auth):
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan test
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 📄 License
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

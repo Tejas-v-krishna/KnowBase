@@ -14,8 +14,10 @@
         fetch('/search/suggestions?q=' + encodeURIComponent(this.query))
             .then(res => res.json())
             .then(data => {
-                this.results = data;
-                this.loading = false;
+                setTimeout(() => {
+                    this.results = data;
+                    this.loading = false;
+                }, 1000);
             });
     }
 }" class="sticky top-4 z-50 max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 mb-8">
@@ -205,50 +207,75 @@
 
              <div class="max-h-[60vh] overflow-y-auto px-2 py-4" x-show="query.length > 0" style="display:none;">
                  
-                 <template x-if="results.questions && results.questions.length > 0">
-                     <div class="mb-4">
-                         <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Questions</h3>
-                         <ul class="space-y-1">
-                             <template x-for="item in results.questions" :key="item.id">
-                                 <li>
-                                     <a :href="'/questions/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
-                                 </li>
-                             </template>
-                         </ul>
+                 <!-- Shimmer Loading Skeleton for search results -->
+                 <div x-show="loading" class="space-y-6">
+                     <!-- Questions Skeleton -->
+                     <div>
+                         <div class="h-3 w-24 rounded bg-slate-200 shimmer mx-3 mb-3"></div>
+                         <div class="space-y-1">
+                             <div class="px-3 py-2.5"><div class="h-4 w-3/4 rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-2/3 rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-[85%] rounded bg-slate-100 shimmer"></div></div>
+                         </div>
                      </div>
-                 </template>
-                 
-                 <template x-if="results.articles && results.articles.length > 0">
-                     <div class="mb-4">
-                         <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Articles</h3>
-                         <ul class="space-y-1">
-                             <template x-for="item in results.articles" :key="item.id">
-                                 <li>
-                                     <a :href="'/articles/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
-                                 </li>
-                             </template>
-                         </ul>
+                     
+                     <!-- Articles Skeleton -->
+                     <div>
+                         <div class="h-3 w-20 rounded bg-slate-200 shimmer mx-3 mb-3"></div>
+                         <div class="space-y-1">
+                             <div class="px-3 py-2.5"><div class="h-4 w-[70%] rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-4/5 rounded bg-slate-100 shimmer"></div></div>
+                         </div>
                      </div>
-                 </template>
+                 </div>
 
-                 <template x-if="results.threads && results.threads.length > 0">
-                     <div class="mb-4">
-                         <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Forums</h3>
-                         <ul class="space-y-1">
-                             <template x-for="item in results.threads" :key="item.id">
-                                 <li>
-                                     <a :href="'/threads/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
-                                 </li>
-                             </template>
-                         </ul>
-                     </div>
-                 </template>
-                 
-                 <template x-if="(!results.questions || results.questions.length === 0) && (!results.articles || results.articles.length === 0) && (!results.threads || results.threads.length === 0) && !loading">
-                     <div class="text-center py-8">
-                         <p class="text-sm text-slate-500">No results found for "<span x-text="query" class="font-bold text-slate-900"></span>".</p>
-                     </div>
-                 </template>
+                 <div x-show="!loading" class="space-y-4">
+                     
+                     <template x-if="results.questions && results.questions.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Questions</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.questions" :key="item.id">
+                                     <li>
+                                         <a :href="'/questions/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+                     
+                     <template x-if="results.articles && results.articles.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Articles</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.articles" :key="item.id">
+                                     <li>
+                                         <a :href="'/articles/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+
+                     <template x-if="results.threads && results.threads.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Forums</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.threads" :key="item.id">
+                                     <li>
+                                         <a :href="'/threads/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+                     
+                     <template x-if="(!results.questions || results.questions.length === 0) && (!results.articles || results.articles.length === 0) && (!results.threads || results.threads.length === 0) && !loading">
+                         <div class="text-center py-8">
+                             <p class="text-sm text-slate-500">No results found for "<span x-text="query" class="font-bold text-slate-900"></span>".</p>
+                         </div>
+                     </template>
+                 </div>
              </div>
              
              <!-- Show before typing -->

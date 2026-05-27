@@ -105,16 +105,20 @@
                                 })
                                 .then(res => res.json())
                                 .then(data => {
-                                    this.aiResponse = data.ai_response;
-                                    this.related = data.related;
-                                    this.suggestions = data.suggestions || [];
-                                    this.loading = false;
-                                    this.typeResponse(data.ai_response);
+                                    setTimeout(() => {
+                                        this.aiResponse = data.ai_response;
+                                        this.related = data.related;
+                                        this.suggestions = data.suggestions || [];
+                                        this.loading = false;
+                                        this.typeResponse(data.ai_response);
+                                    }, 1000);
                                 })
                                 .catch(err => {
-                                    this.aiResponse = 'Sorry, an error occurred while connecting to the AI. ' + err.message;
-                                    this.loading = false;
-                                    this.typeResponse(this.aiResponse);
+                                    setTimeout(() => {
+                                        this.aiResponse = 'Sorry, an error occurred while connecting to the AI. ' + err.message;
+                                        this.loading = false;
+                                        this.typeResponse(this.aiResponse);
+                                    }, 1000);
                                 });
                             },
                             typeResponse(fullText) {
@@ -169,9 +173,30 @@
                             </div>
 
                             <!-- AI Output Container -->
-                            <div x-show="aiResponse || (related.questions && related.questions.length)" style="display:none;" class="border-t border-slate-100 p-5 bg-slate-50/50 rounded-b-2xl text-left">
+                            <div x-show="loading || aiResponse || (related.questions && related.questions.length)" style="display:none;" class="border-t border-slate-100 p-5 bg-slate-50/50 rounded-b-2xl text-left">
+                                <!-- AI Loading Shimmer Skeleton -->
+                                <div x-show="loading" class="space-y-4">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <div class="h-6 w-6 rounded bg-slate-900 text-white flex items-center justify-center animate-pulse">
+                                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                        </div>
+                                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">AI is thinking...</span>
+                                    </div>
+                                    <div class="space-y-2.5">
+                                        <div class="h-4 w-full rounded bg-slate-200 shimmer"></div>
+                                        <div class="h-4 w-[92%] rounded bg-slate-200 shimmer"></div>
+                                        <div class="h-4 w-[85%] rounded bg-slate-200 shimmer"></div>
+                                        <div class="h-4 w-[60%] rounded bg-slate-200 shimmer"></div>
+                                    </div>
+                                    <div class="mt-6 border-t border-slate-200/60 pt-4 space-y-2.5">
+                                        <div class="h-3 w-1/4 rounded bg-slate-200 shimmer mb-1"></div>
+                                        <div class="h-9 w-3/4 rounded-xl bg-slate-100 shimmer"></div>
+                                        <div class="h-9 w-2/3 rounded-xl bg-slate-100 shimmer"></div>
+                                    </div>
+                                </div>
+
                                 <!-- AI Answer -->
-                                <div x-show="aiResponse" class="mb-4">
+                                <div x-show="!loading && aiResponse" class="mb-4">
                                     <div class="flex items-center gap-2 mb-2">
                                         <div class="h-6 w-6 rounded bg-slate-900 text-white flex items-center justify-center">
                                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -182,7 +207,7 @@
                                 </div>
 
                                 <!-- Suggestions -->
-                                <div x-show="suggestions && suggestions.length > 0" style="display:none;" class="mt-6 border-t border-slate-200 pt-4">
+                                <div x-show="!loading && suggestions && suggestions.length > 0" style="display:none;" class="mt-6 border-t border-slate-200 pt-4">
                                     <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Suggested Follow-ups:</h4>
                                     <div class="flex flex-col gap-2">
                                         <template x-for="suggestion in suggestions" :key="suggestion">
@@ -194,7 +219,7 @@
                                 </div>
 
                                 <!-- Related Knowbase Results -->
-                                <div x-show="related.questions && related.questions.length > 0">
+                                <div x-show="!loading && related.questions && related.questions.length > 0">
                                     <h4 class="text-xs font-bold text-slate-900 mb-2 mt-4">Related on KnowBase:</h4>
                                     <ul class="space-y-1.5">
                                         <template x-for="q in related.questions" :key="q.id">
@@ -717,11 +742,13 @@
                         fetch('{{ route('trivia.random') }}')
                             .then(res => res.json())
                             .then(data => {
-                                this.question = data.question;
-                                this.category = data.category;
-                                this.difficulty = data.difficulty;
-                                this.answers = data.answers;
-                                this.loading = false;
+                                setTimeout(() => {
+                                    this.question = data.question;
+                                    this.category = data.category;
+                                    this.difficulty = data.difficulty;
+                                    this.answers = data.answers;
+                                    this.loading = false;
+                                }, 1000);
                             });
                     },
                     submitAnswer(ans) {
@@ -753,13 +780,22 @@
                         </span>
                     </div>
 
-                    <!-- Loading State -->
-                    <div x-show="loading" class="py-8 flex flex-col items-center justify-center space-y-3">
-                        <svg class="h-6 w-6 animate-spin text-slate-900" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span class="text-xs font-semibold text-slate-400">Loading trivia...</span>
+                    <!-- Loading State (Skeleton Shimmer) -->
+                    <div x-show="loading" class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="h-3 w-1/4 rounded bg-slate-200 shimmer"></div>
+                            <div class="h-3 w-12 rounded bg-slate-200 shimmer"></div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="h-4 w-full rounded bg-slate-200 shimmer"></div>
+                            <div class="h-4 w-[80%] rounded bg-slate-200 shimmer"></div>
+                        </div>
+                        <div class="space-y-2.5 pt-2">
+                            <div class="h-[38px] w-full rounded-xl bg-slate-100 shimmer"></div>
+                            <div class="h-[38px] w-full rounded-xl bg-slate-100 shimmer"></div>
+                            <div class="h-[38px] w-full rounded-xl bg-slate-100 shimmer"></div>
+                            <div class="h-[38px] w-full rounded-xl bg-slate-100 shimmer"></div>
+                        </div>
                     </div>
 
                     <!-- Question Container -->

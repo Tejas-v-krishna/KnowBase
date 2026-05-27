@@ -33,6 +33,13 @@
     .btn-outline {
         @apply bg-white border border-slate-200 hover:border-slate-400 text-slate-700 hover:text-slate-900 font-semibold rounded-[50px] transition-all duration-200;
     }
+    /* Shimmer effect */
+    .shimmer {
+        background-color: #e2e8f0; /* Default base background for the skeleton */
+        background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+    }
     /* Active nav pill */
     .nav-active {
         @apply bg-slate-900 text-white;
@@ -357,8 +364,4 @@ html.lenis, html.lenis body { height: auto; }
     100% { background-position: 200% 0; }
 }
 
-.shimmer {
-    background: linear-gradient(90deg, #f8fafc 25%, #f1f5f9 50%, #f8fafc 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite linear;
-}
+
