@@ -1,0 +1,364 @@
+@import url('https://fonts.cdnfonts.com/css/google-sans');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply font-sans tracking-tight text-slate-700 bg-white antialiased selection:bg-slate-900 selection:text-white;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-outfit font-bold tracking-tight text-slate-900;
+    }
+    a {
+        @apply transition-colors duration-150;
+    }
+}
+
+@layer utilities {
+    /* Card: subtle border + soft shadow */
+    .card {
+        @apply bg-white border border-slate-100 rounded-2xl shadow-sm;
+    }
+    /* Card with hover lift */
+    .card-hover {
+        @apply hover:border-slate-200 hover:shadow-md hover:-translate-y-px transition-all duration-200;
+    }
+    /* Primary filled button */
+    .btn-primary {
+        @apply bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-[50px] transition-all duration-200;
+    }
+    /* Outline button */
+    .btn-outline {
+        @apply bg-white border border-slate-200 hover:border-slate-400 text-slate-700 hover:text-slate-900 font-semibold rounded-[50px] transition-all duration-200;
+    }
+    /* Active nav pill */
+    .nav-active {
+        @apply bg-slate-900 text-white;
+    }
+    /* Badge chip */
+    .badge {
+        @apply bg-slate-100 text-slate-600 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-slate-200;
+    }
+}
+
+/* ─── Global Premium Rounding System ──────────────── */
+/* 1. Fully Pill-Shaped Elements (Buttons, Inputs, Selects, Badges, Tags) */
+button,
+.btn-primary,
+.btn-outline,
+input[type="submit"],
+input[type="button"],
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="number"],
+select,
+.badge,
+.tag-badge,
+a[class*="bg-slate-900"],
+a[class*="bg-slate-950"],
+a[class*="bg-slate-800"],
+a[class*="bg-black"],
+a[class*="border-slate-200"][class*="text-slate-700"],
+button[class*="rounded-"],
+a.inline-flex[class*="rounded-"] {
+    border-radius: 9999px !important;
+}
+
+/* 2. Squircle Card & Panel Layouts (Cards, Containers, Textareas, Modals, Dropdowns) */
+.card,
+.bg-white.border,
+.bg-white.shadow-sm,
+.bg-slate-50.border,
+form.bg-white,
+textarea,
+[class*="rounded-2xl"],
+[class*="rounded-3xl"] {
+    border-radius: 1.5rem !important; /* 24px squircle */
+}
+
+/* 3. Fully Circular User Avatars */
+img.h-8.w-8, img.h-10.w-10, img.h-12.w-12, img.h-28.w-28,
+div.h-8.w-8, div.h-10.w-10, div.h-12.w-12, div.h-28.w-28,
+img[class*="h-10"][class*="w-10"],
+img[class*="h-8"][class*="w-8"],
+img[class*="h-12"][class*="w-12"],
+img[class*="h-28"][class*="w-28"] {
+    border-radius: 9999px !important;
+}
+
+/* ─── Custom Scrollbar ─────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+/* ─── Trix Editor (Unified Premium Styles) ──────── */
+trix-toolbar {
+    display: block !important;
+    background-color: #f8fafc !important; /* bg-slate-50 */
+    border: 1px solid #e2e8f0 !important; /* border-slate-200 */
+    border-top-left-radius: 1rem !important; /* rounded-t-2xl */
+    border-top-right-radius: 1rem !important; /* rounded-t-2xl */
+    padding: 0.75rem !important; /* p-3 */
+    margin-bottom: 0 !important;
+}
+
+trix-toolbar .trix-button-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important; /* gap-2 */
+    justify-content: flex-start !important;
+    margin-bottom: 0 !important;
+}
+
+trix-toolbar .trix-button-group {
+    display: flex !important;
+    align-items: center !important;
+    border: 1px solid #e2e8f0 !important; /* border-slate-200 */
+    background-color: #ffffff !important;
+    border-radius: 0.75rem !important; /* rounded-xl */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; /* shadow-sm */
+    margin-bottom: 0 !important;
+}
+
+trix-toolbar .trix-button-group:not(:first-child) {
+    margin-left: 0 !important;
+}
+
+trix-toolbar .trix-button-group-spacer {
+    display: none !important;
+}
+
+trix-toolbar .trix-button {
+    border: 0 !important;
+    border-right: 1px solid #f1f5f9 !important; /* border-slate-100 */
+    background-color: transparent !important;
+    color: #475569 !important; /* text-slate-600 */
+    transition: all 150ms ease-in-out !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    border-radius: 0px !important;
+}
+
+trix-toolbar .trix-button:hover {
+    background-color: #f8fafc !important; /* bg-slate-50 */
+}
+
+trix-toolbar .trix-button-group button:first-child,
+trix-toolbar .trix-button-group .trix-button:first-child {
+    border-top-left-radius: 0.75rem !important;
+    border-bottom-left-radius: 0.75rem !important;
+}
+
+trix-toolbar .trix-button-group button:last-child,
+trix-toolbar .trix-button-group .trix-button:last-child {
+    border-top-right-radius: 0.75rem !important;
+    border-bottom-right-radius: 0.75rem !important;
+    border-right: 0 !important;
+}
+
+trix-toolbar .trix-button--active {
+    background-color: #f1f5f9 !important; /* bg-slate-100 */
+    color: #0f172a !important; /* text-slate-900 */
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06) !important; /* shadow-inner */
+}
+
+/* Override text-indent to let our custom SVG icons render inside the buttons */
+trix-toolbar .trix-button--icon {
+    text-indent: 0 !important;
+}
+
+/* Hide Trix default pseudo-element background-image icons completely */
+trix-toolbar .trix-button::before,
+trix-toolbar .trix-button--icon::before,
+trix-toolbar [class*="trix-button--icon"]::before {
+    display: none !important;
+    content: none !important;
+    background-image: none !important;
+}
+
+/* Hide empty dialog wrapper, style active dialog only */
+trix-toolbar .trix-dialogs {
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin-top: 0.5rem !important;
+}
+
+trix-toolbar .trix-dialog {
+    display: none !important;
+}
+
+trix-toolbar .trix-dialog[data-trix-active] {
+    display: block !important;
+    border: 1px solid #e2e8f0 !important; /* border-slate-200 */
+    background-color: #ffffff !important;
+    border-radius: 1rem !important; /* rounded-2xl */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important; /* shadow-lg */
+    padding: 1rem !important; /* p-4 */
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+}
+
+/* Dialog Fields & Inputs */
+trix-toolbar .trix-dialog__link-fields {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+trix-toolbar .trix-dialog__link-fields .trix-input {
+    flex: 1 !important;
+    margin: 0 !important;
+}
+
+trix-toolbar .trix-input,
+trix-toolbar .trix-input--dialog {
+    border: 1px solid #e2e8f0 !important; /* border-slate-200 */
+    border-radius: 0.75rem !important; /* rounded-xl */
+    padding: 0.5rem 1rem !important; /* px-4 py-2 */
+    outline: none !important;
+    font-size: 0.875rem !important; /* text-sm */
+    background-color: #f8fafc !important; /* bg-slate-50 */
+    color: #0f172a !important; /* text-slate-900 */
+    transition: all 150ms ease-in-out !important;
+}
+
+trix-toolbar .trix-input:focus,
+trix-toolbar .trix-input--dialog:focus {
+    border-color: #0f172a !important; /* border-slate-900 */
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Link dialog buttons styling */
+trix-toolbar .trix-button--dialog {
+    font-size: 0.75rem !important; /* text-xs */
+    font-weight: 700 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.75rem !important; /* rounded-xl */
+    cursor: pointer !important;
+    transition: all 150ms ease-in-out !important;
+    border: 0 !important;
+}
+
+/* Link Button (positive action) */
+trix-toolbar .trix-button--dialog[data-trix-method="setAttribute"] {
+    background-color: #0f172a !important; /* bg-slate-900 */
+    color: #ffffff !important;
+}
+
+trix-toolbar .trix-button--dialog[data-trix-method="setAttribute"]:hover {
+    background-color: #1e293b !important; /* bg-slate-800 */
+}
+
+/* Unlink Button (negative action) */
+trix-toolbar .trix-button--dialog[data-trix-method="removeAttribute"] {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important; /* border-slate-200 */
+    color: #475569 !important; /* text-slate-600 */
+}
+
+trix-toolbar .trix-button--dialog[data-trix-method="removeAttribute"]:hover {
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+    background-color: #f8fafc !important;
+}
+
+trix-editor {
+    min-height: 250px; /* default height, easily overridden by tailwind */
+    border: 1px solid #e2e8f0 !important;
+    border-top: 0 !important;
+    border-bottom-left-radius: 1rem !important; /* rounded-b-2xl */
+    border-bottom-right-radius: 1rem !important; /* rounded-b-2xl */
+    padding: 1.25rem !important; /* p-5 */
+    background-color: #ffffff !important;
+    outline: none !important;
+    color: #1e293b !important; /* text-slate-800 */
+    transition: all 150ms ease-in-out !important;
+    font-size: 1rem !important;
+    line-height: 1.625 !important;
+    margin-top: 0 !important;
+}
+
+trix-editor:focus {
+    border-color: rgba(15, 23, 42, 0.3) !important;
+    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+trix-toolbar:has(+ trix-editor:focus) {
+    border-color: rgba(15, 23, 42, 0.3) !important;
+}
+
+/* ─── Lenis Smooth Scroll ──────────────────────── */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* ─── Smooth Transitions & Blur-in Animations ───── */
+@keyframes pageEntrance {
+    0% {
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+}
+
+.animate-page-entrance {
+    animation: pageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes componentBlurIn {
+    0% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: scale(0.98) translateY(12px);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1) translateY(0);
+    }
+}
+
+.animate-blur-in {
+    opacity: 0;
+    animation: componentBlurIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-75 { animation-delay: 75ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-500 { animation-delay: 500ms; }
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.shimmer {
+    background: linear-gradient(90deg, #f8fafc 25%, #f1f5f9 50%, #f8fafc 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+}

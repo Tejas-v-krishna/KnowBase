@@ -1,0 +1,23 @@
+<?php
+namespace App\Policies;
+
+use App\Models\Question;
+use App\Models\User;
+
+class QuestionPolicy
+{
+    public function update(User $user, Question $question): bool
+    {
+        return $user->id === $question->user_id || $user->isAdmin();
+    }
+
+    public function delete(User $user, Question $question): bool
+    {
+        return $user->id === $question->user_id || $user->isAdmin();
+    }
+
+    public function close(User $user, Question $question): bool
+    {
+        return $user->isModerator();
+    }
+}

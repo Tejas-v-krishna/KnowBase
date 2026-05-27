@@ -1,0 +1,103 @@
+<x-guest-layout>
+    <!-- Illustration for the left panel -->
+    <x-slot:illustration>
+        <img src="{{ asset('images/register-illustration.png') }}"
+             alt="Joining the KnowBase community"
+             class="w-full h-full object-cover">
+    </x-slot:illustration>
+
+
+    <div class="mb-8">
+        <h2 class="text-4xl font-outfit text-slate-900 mb-2 font-normal">Create an Account</h2>
+        <p class="text-sm font-medium text-slate-500">
+            Already have an account? 
+            <a href="{{ route('login') }}" class="font-bold text-slate-900 hover:underline underline-offset-2">Log in</a>
+        </p>
+    </div>
+
+    <form method="POST" action="{{ route('register') }}" class="space-y-6">
+        @csrf
+
+        <!-- First Row: Full Name & Username -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="name" class="block text-sm font-semibold text-slate-900 mb-2">Full Name</label>
+                <input id="name" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" class="block w-full px-5 py-3 border border-slate-200 rounded-full shadow-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none text-sm transition-all" placeholder="Alex Smith">
+                <x-input-error :messages="$errors->get('name')" class="mt-1" />
+            </div>
+
+            <div>
+                <label for="username" class="block text-sm font-semibold text-slate-900 mb-2">Username</label>
+                <input id="username" type="text" name="username" :value="old('username')" required autocomplete="username" class="block w-full px-5 py-3 border border-slate-200 rounded-full shadow-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none text-sm transition-all" placeholder="alexsmith">
+                <x-input-error :messages="$errors->get('username')" class="mt-1" />
+            </div>
+        </div>
+
+        <!-- Email Address -->
+        <div>
+            <label for="email" class="block text-sm font-semibold text-slate-900 mb-2">Email Address</label>
+            <input id="email" type="email" name="email" :value="old('email')" required class="block w-full px-5 py-3 border border-slate-200 rounded-full shadow-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none text-sm transition-all" placeholder="Email Address">
+            <x-input-error :messages="$errors->get('email')" class="mt-1" />
+        </div>
+
+        <!-- Password -->
+        <div>
+            <label for="password" class="block text-sm font-semibold text-slate-900 mb-2">Password</label>
+            <div class="relative">
+                <input id="password" type="password" name="password" required autocomplete="new-password" class="block w-full px-5 py-3 border border-slate-200 rounded-full shadow-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none text-sm transition-all" placeholder="Password">
+                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                </button>
+            </div>
+            <x-input-error :messages="$errors->get('password')" class="mt-1" />
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+            <label for="password_confirmation" class="block text-sm font-semibold text-slate-900 mb-2">Confirm Password</label>
+            <div class="relative">
+                <input id="password_confirmation" type="password" name="password_confirmation" required class="block w-full px-5 py-3 border border-slate-200 rounded-full shadow-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none text-sm transition-all" placeholder="Password">
+            </div>
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1" />
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-black hover:bg-slate-800 text-white rounded-full font-bold text-sm transition-all shadow-md">
+            Create Account
+        </button>
+
+        <!-- Terms and Conditions -->
+        <div class="flex items-center">
+            <div class="flex h-5 items-center">
+                <input id="terms" type="checkbox" name="terms" required class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 bg-slate-50 cursor-pointer">
+            </div>
+            <div class="ml-2 text-sm">
+                <label for="terms" class="font-medium text-slate-600 select-none cursor-pointer">
+                    I agree to the <a href="#" class="font-bold text-slate-900 hover:underline">Terms & Condition</a>
+                </label>
+            </div>
+        </div>
+
+        <!-- Social Login Separator -->
+        <div class="relative py-4">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-slate-100"></div>
+            </div>
+            <div class="relative flex justify-center text-sm font-medium leading-6">
+                <span class="bg-white px-4 text-slate-400">or</span>
+            </div>
+        </div>
+
+        <!-- Social Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3">
+            <button type="button" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors text-xs font-semibold text-slate-600">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4" alt="Google">
+                Continue with Google
+            </button>
+            <button type="button" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors text-xs font-semibold text-slate-600">
+                <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-4 h-4" alt="Facebook">
+                Continue with Facebook
+            </button>
+        </div>
+
+    </form>
+</x-guest-layout>
