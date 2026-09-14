@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="H8zVCxkyyq6xS4s85LTQRkEcvCXHhRSYb6yjPQFb">
+
+        <title>Laravel</title>
+
+        <!-- Trix Editor CDN -->
+        <link rel="stylesheet" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+        <script src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
+
+        <!-- Scripts & Tailwind -->
+        <link rel="preload" as="style" href="/build/assets/app-D7uogfcc.css" /><link rel="modulepreload" as="script" href="/build/assets/app-DJrsl1FZ.js" /><link rel="stylesheet" href="/build/assets/app-D7uogfcc.css" data-navigate-track="reload" /><script type="module" src="/build/assets/app-DJrsl1FZ.js" data-navigate-track="reload"></script>
+        <!-- Livewire Styles -->
+        
+    </head>
+    <body class="font-sans antialiased text-slate-700 bg-white flex flex-col min-h-screen">
+        <div x-data="{ 
+    open: false, 
+    userDropdown: false, 
+    searchModalOpen: false,
+    query: '',
+    loading: false,
+    results: {questions: [], articles: [], threads: []},
+    fetchResults() {
+        if(this.query.length < 2) {
+            this.results = {questions: [], articles: [], threads: []};
+            return;
+        }
+        this.loading = true;
+        fetch('/search/suggestions?q=' + encodeURIComponent(this.query))
+            .then(res => res.json())
+            .then(data => {
+                setTimeout(() => {
+                    this.results = data;
+                    this.loading = false;
+                }, 1000);
+            });
+    }
+}" class="sticky top-4 z-50 max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <nav class="bg-white/90 backdrop-blur-xl border border-slate-200 shadow-sm rounded-full px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16 gap-4">
+
+            
+            <div class="flex items-center flex-shrink-0">
+                <a href="/">
+                    <span class="text-xl font-extrabold tracking-tight font-outfit text-slate-900">Know<span class="text-slate-400">Base</span></span>
+                </a>
+            </div>
+
+            
+            <div class="hidden lg:flex flex-1 items-center justify-center gap-6 px-8">
+                
+                <div class="flex items-center gap-1">
+                    <a href="/" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Home</a>
+                    <a href="/questions" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Q&amp;A</a>
+                    <a href="/articles" class="px-3 py-2 rounded-full text-sm font-semibold transition-all bg-slate-100 text-slate-900">Articles</a>
+                    <a href="/threads" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Forums</a>
+                    <a href="/leaderboard" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Leaderboard</a>
+                </div>
+
+                
+                <div class="flex-1 max-w-xs">
+                    <button @click="searchModalOpen = true; $nextTick(() => $refs.searchInput.focus())" class="w-full relative group flex items-center pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-400 hover:bg-white hover:border-slate-400 transition-all text-left">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        Search...
+                    </button>
+                </div>
+            </div>
+
+            
+            <div class="flex items-center flex-shrink-0 gap-2">
+                                    <a href="/login" class="text-sm font-semibold text-slate-500 hover:text-slate-900 px-4 py-2 rounded-full transition-all">Log in</a>
+                    <a href="/register" class="text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 px-5 py-2.5 rounded-full transition-all shadow-sm">Sign up</a>
+                
+                
+                <button @click="open = !open" class="md:hidden p-2 rounded-full text-slate-500 hover:bg-slate-100 transition-all">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path :class="{'hidden': open, 'inline-flex': !open}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path :class="{'hidden': !open, 'inline-flex': open}" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    
+    <div x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 -translate-y-2 scale-95"
+         class="md:hidden absolute top-[calc(100%+0.5rem)] left-4 right-4 bg-white border border-slate-100 rounded-3xl p-4 space-y-1 shadow-xl shadow-slate-200/50"
+         style="display: none;">
+        <div class="relative mb-3">
+            <button @click="searchModalOpen = true; open = false; $nextTick(() => $refs.searchInput.focus())" class="w-full flex items-center text-left pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-400 outline-none hover:border-slate-400 transition-all">
+                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                Search...
+            </button>
+        </div>
+        <a href="/" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Home</a>
+        <a href="/questions" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Q&amp;A</a>
+        <a href="/articles" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Articles</a>
+        <a href="/threads" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Forums</a>
+        <a href="/leaderboard" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Leaderboard</a>
+        <a href="/topics" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Topics</a>
+    </div>
+
+    
+    <div x-show="searchModalOpen" style="display: none;" class="fixed inset-0 z-[100] flex items-start justify-center pt-16 sm:pt-24 px-4" @keydown.escape.window="searchModalOpen = false">
+        <div x-show="searchModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" @click="searchModalOpen = false"></div>
+        
+        <div x-show="searchModalOpen" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 -translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 -translate-y-4"
+             class="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden ring-1 ring-slate-100"
+             @click.stop>
+             
+             <div class="flex items-center px-4 py-4 border-b border-slate-100">
+                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input x-ref="searchInput" x-model="query" @input.debounce.300ms="fetchResults()" @keydown.enter="window.location.href = '/search?q=' + encodeURIComponent(query)" type="text" placeholder="Search questions, articles, forums..." class="flex-1 bg-transparent border-0 focus:ring-0 text-base text-slate-900 px-4 outline-none placeholder:text-slate-400">
+                <div x-show="loading" class="h-4 w-4 rounded-full border-2 border-slate-200 border-t-slate-500 animate-spin mr-2" style="display:none;"></div>
+                <button @click="searchModalOpen = false" class="text-xs font-semibold text-slate-400 hover:text-slate-700 bg-slate-100 px-2 py-1 rounded">ESC</button>
+             </div>
+
+             <div class="max-h-[60vh] overflow-y-auto px-2 py-4" x-show="query.length > 0" style="display:none;">
+                 
+                 <!-- Shimmer Loading Skeleton for search results -->
+                 <div x-show="loading" class="space-y-6">
+                     <!-- Questions Skeleton -->
+                     <div>
+                         <div class="h-3 w-24 rounded bg-slate-200 shimmer mx-3 mb-3"></div>
+                         <div class="space-y-1">
+                             <div class="px-3 py-2.5"><div class="h-4 w-3/4 rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-2/3 rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-[85%] rounded bg-slate-100 shimmer"></div></div>
+                         </div>
+                     </div>
+                     
+                     <!-- Articles Skeleton -->
+                     <div>
+                         <div class="h-3 w-20 rounded bg-slate-200 shimmer mx-3 mb-3"></div>
+                         <div class="space-y-1">
+                             <div class="px-3 py-2.5"><div class="h-4 w-[70%] rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-4/5 rounded bg-slate-100 shimmer"></div></div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div x-show="!loading" class="space-y-4">
+                     
+                     <template x-if="results.questions && results.questions.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Questions</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.questions" :key="item.id">
+                                     <li>
+                                         <a :href="'/questions/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+                     
+                     <template x-if="results.articles && results.articles.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Articles</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.articles" :key="item.id">
+                                     <li>
+                                         <a :href="'/articles/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+
+                     <template x-if="results.threads && results.threads.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Forums</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.threads" :key="item.id">
+                                     <li>
+                                         <a :href="'/threads/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+                     
+                     <template x-if="(!results.questions || results.questions.length === 0) && (!results.articles || results.articles.length === 0) && (!results.threads || results.threads.length === 0) && !loading">
+                         <div class="text-center py-8">
+                             <p class="text-sm text-slate-500">No results found for "<span x-text="query" class="font-bold text-slate-900"></span>".</p>
+                         </div>
+                     </template>
+                 </div>
+             </div>
+             
+             <!-- Show before typing -->
+             <div class="px-6 py-12 text-center" x-show="query.length === 0">
+                 <p class="text-sm font-medium text-slate-400">Start typing to search across all content...</p>
+             </div>
+             
+        </div>
+    </div>
+</div>
+
+        <!-- Main Wrapper -->
+        <main class="flex-grow py-8 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <!-- Alert Notifications -->
+            
+            
+            <div class="animate-page-entrance">
+                <div class="space-y-6">
+
+        
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-100">
+            <div>
+                <h1 class="text-2xl font-extrabold font-outfit text-slate-900">Knowledge Base Articles</h1>
+                <p class="text-slate-400 text-sm mt-0.5">Discover detailed posts, guides, and documentations from the community.</p>
+            </div>
+            <a href="/articles/create" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-sm shrink-0">
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+                Write an Article
+            </a>
+        </div>
+
+        
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                                    <a href="/articles?sort=latest"
+                       class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-slate-900 shadow-sm">
+                        Latest
+                    </a>
+                                    <a href="/articles?sort=liked"
+                       class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-500 hover:text-slate-700">
+                        Most Liked
+                    </a>
+                                    <a href="/articles?sort=viewed"
+                       class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-500 hover:text-slate-700">
+                        Most Read
+                    </a>
+                            </div>
+        </div>
+
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Understanding Quadratic Equations: A Complete Beginner&#039;s Guide">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Technology</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">1 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/understanding-quadratic-equations-a-complete-beginners-guide" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                Understanding Quadratic Equations: A Complete Beginner&#039;s Guide
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">Quadratic equations appear in everything from physics to economics. This guide breaks down the quadratic formula and shows you exactly how to use it.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/productivity" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Productivity
+                                    </a>
+                                                                    <a href="/tags/html" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        HTML
+                                    </a>
+                                                                    <a href="/tags/css" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        CSS
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        GA
+                                    </div>
+                                                                <a href="/u/indrani.tella" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Ganesh Chopra</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">4 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1471086569966-db3eebc25a59?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="How Photosynthesis Works: From Sunlight to Sugar">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Science</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">1 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/how-photosynthesis-works-from-sunlight-to-sugar" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                How Photosynthesis Works: From Sunlight to Sugar
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">Plants are incredible chemical factories. Discover the step-by-step process by which they convert sunlight, water, and carbon dioxide into glucose and oxygen.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/cloud" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Cloud
+                                    </a>
+                                                                    <a href="/tags/git" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Git
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        FE
+                                    </div>
+                                                                <a href="/u/mohanlal37" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Feroz Majumdar</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">4 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Introduction to Algorithms: Big O Notation Explained Simply">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Technology</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">2 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/introduction-to-algorithms-big-o-notation-explained-simply" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                Introduction to Algorithms: Big O Notation Explained Simply
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">Big O notation is how computer scientists measure and compare the efficiency of algorithms. Learn what O(n), O(log n), and O(n²) actually mean.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/javascript" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        JavaScript
+                                    </a>
+                                                                    <a href="/tags/css" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        CSS
+                                    </a>
+                                                                    <a href="/tags/swift" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Swift
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        AA
+                                    </div>
+                                                                <a href="/u/teena.mohabir" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Aayushi Sharaf</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">4 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="How to Write a Perfect Essay: Structure, Argument &amp; Style">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Technology</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">1 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/how-to-write-a-perfect-essay-structure-argument-style" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                How to Write a Perfect Essay: Structure, Argument &amp; Style
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">A well-structured essay is clear, persuasive, and engaging. This guide walks you through every section — from writing a strong thesis to crafting a memorable conclusion.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/database" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Database
+                                    </a>
+                                                                    <a href="/tags/docker" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Docker
+                                    </a>
+                                                                    <a href="/tags/agile" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Agile
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        DR
+                                    </div>
+                                                                <a href="/u/qnanda" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Drishti Bahadur Mitra</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">4 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="The Causes of World War I: A Deep Dive">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Technology</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">1 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/the-causes-of-world-war-i-a-deep-dive" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                The Causes of World War I: A Deep Dive
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">World War I was not caused by a single assassination. Long-simmering tensions, alliance systems, and imperial rivalry made Europe a powder keg by 1914.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/ux-design" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        UX Design
+                                    </a>
+                                                                    <a href="/tags/docker" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Docker
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        PR
+                                    </div>
+                                                                <a href="/u/moderator" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Priya Sharma</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">4 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="The Periodic Table: How to Read and Understand It">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Technology</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">1 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/the-periodic-table-how-to-read-and-understand-it" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                The Periodic Table: How to Read and Understand It
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">The periodic table is one of the most powerful tools in science. Once you understand how it is organised, chemistry becomes much easier.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/python" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Python
+                                    </a>
+                                                                    <a href="/tags/ux-design" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        UX Design
+                                    </a>
+                                                                    <a href="/tags/html" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        HTML
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        MO
+                                    </div>
+                                                                <a href="/u/borah.zahir" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Moti Sodhi</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">4 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Supply and Demand: The Core of All Economics">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Technology</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">1 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/supply-and-demand-the-core-of-all-economics" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                Supply and Demand: The Core of All Economics
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">Why do prices go up when something is scarce? Why do wages fall in oversaturated job markets? It all comes back to the law of supply and demand.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/productivity" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Productivity
+                                    </a>
+                                                                    <a href="/tags/html" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        HTML
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        KR
+                                    </div>
+                                                                <a href="/u/mohan41" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Krishna Lal</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">4 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="How Your Immune System Protects You From Disease">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Health</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">1 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/how-your-immune-system-protects-you-from-disease" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                How Your Immune System Protects You From Disease
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">Your immune system is an incredibly complex network of cells, tissues, and organs working 24/7 to keep you healthy. Here is how it actually works.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/ux-design" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        UX Design
+                                    </a>
+                                                                    <a href="/tags/cloud" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Cloud
+                                    </a>
+                                                                    <a href="/tags/git" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Git
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        MO
+                                    </div>
+                                                                <a href="/u/jaish" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Mohammad Jaish</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">4 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Why Do Seasons Change? The Science Behind the Seasons">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Technology</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">1 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/why-do-seasons-change-the-science-behind-the-seasons" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                Why Do Seasons Change? The Science Behind the Seasons
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">Many people think seasons are caused by Earth&#039;s distance from the Sun. They are wrong! Discover the real reason we have summer and winter.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/javascript" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        JavaScript
+                                    </a>
+                                                                    <a href="/tags/cloud" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Cloud
+                                    </a>
+                                                                    <a href="/tags/machine-learning" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Machine Learning
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        AL
+                                    </div>
+                                                                <a href="/u/bera.naresh" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Albert Shan</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">5 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                            <article class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    
+                    
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-50">
+                                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&amp;fit=crop&amp;w=800&amp;q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="10 Python Tips Every Beginner Should Know">
+                                            </div>
+
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Technology</span>
+                            <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">2 min read</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold font-outfit text-slate-900 group-hover:text-slate-600 transition-colors leading-snug mb-2">
+                            <a href="/articles/10-python-tips-every-beginner-should-know" class="focus:outline-none">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                10 Python Tips Every Beginner Should Know
+                            </a>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-4 flex-grow">Python is one of the most beginner-friendly languages in the world, but these ten tips will help you write cleaner, more efficient, and more Pythonic code from day one.</p>
+
+                        
+                                                    <div class="flex flex-wrap gap-1.5 mb-5 relative z-10">
+                                                                    <a href="/tags/swift" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Swift
+                                    </a>
+                                                                    <a href="/tags/careers" 
+                                       class="bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-lg transition-colors">
+                                        Careers
+                                    </a>
+                                                            </div>
+                        
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                            <div class="flex items-center gap-2 relative z-10">
+                                                                    <div class="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                        AM
+                                    </div>
+                                                                <a href="/u/amal" class="text-xs font-semibold text-slate-700 hover:text-slate-900">Amal C</a>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-medium">5 months ago</span>
+                        </div>
+                    </div>
+                </article>
+                    </div>
+
+        
+        
+    </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-100 mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div class="flex flex-col md:flex-row items-start justify-between gap-8">
+                    <div>
+                        <p class="font-outfit font-extrabold text-slate-900 text-xl">Know<span class="text-slate-400">Base</span></p>
+                        <p class="text-slate-400 text-sm mt-1 max-w-xs">The student knowledge platform. Ask, answer, and grow together.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-x-12 gap-y-4">
+                        <div>
+                            <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Explore</p>
+                            <div class="flex flex-col gap-1.5">
+                                <a href="/questions" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Q&amp;A</a>
+                                <a href="/articles" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Articles</a>
+                                <a href="/threads" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Forums</a>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Community</p>
+                            <div class="flex flex-col gap-1.5">
+                                <a href="/topics" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Topics</a>
+                                <a href="/leaderboard" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Leaderboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+                    <p class="text-slate-400 text-xs">&copy; 2026 KnowBase. All rights reserved.</p>
+                    <p class="text-slate-300 text-xs">Made with love for students</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Livewire Scripts -->
+        
+
+        <!-- Lenis Smooth Scrolling -->
+        <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    direction: 'vertical',
+                    gestureDirection: 'vertical',
+                    smooth: true,
+                    mouseMultiplier: 1,
+                    smoothTouch: false,
+                    touchMultiplier: 2,
+                    infinite: false,
+                });
+
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+
+                requestAnimationFrame(raf);
+            });
+        </script>
+    </body>
+</html>

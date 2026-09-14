@@ -84,6 +84,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Badge::class, 'badge_user')->withPivot('awarded_at');
     }
 
+    public function challenges() {
+        return $this->belongsToMany(Challenge::class, 'challenge_user')->withPivot('progress', 'completed_at')->withTimestamps();
+    }
+
+    public function thanks() {
+        return $this->hasMany(\App\Models\Thank::class);
+    }
+
     public function isAdmin() {
         return $this->role === 'admin';
     }

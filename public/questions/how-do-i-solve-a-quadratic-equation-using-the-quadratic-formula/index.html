@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="H8zVCxkyyq6xS4s85LTQRkEcvCXHhRSYb6yjPQFb">
+
+        <title>Laravel</title>
+
+        <!-- Trix Editor CDN -->
+        <link rel="stylesheet" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+        <script src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
+
+        <!-- Scripts & Tailwind -->
+        <link rel="preload" as="style" href="/build/assets/app-D7uogfcc.css" /><link rel="modulepreload" as="script" href="/build/assets/app-DJrsl1FZ.js" /><link rel="stylesheet" href="/build/assets/app-D7uogfcc.css" data-navigate-track="reload" /><script type="module" src="/build/assets/app-DJrsl1FZ.js" data-navigate-track="reload"></script>
+        <!-- Livewire Styles -->
+        
+    </head>
+    <body class="font-sans antialiased text-slate-700 bg-white flex flex-col min-h-screen">
+        <div x-data="{ 
+    open: false, 
+    userDropdown: false, 
+    searchModalOpen: false,
+    query: '',
+    loading: false,
+    results: {questions: [], articles: [], threads: []},
+    fetchResults() {
+        if(this.query.length < 2) {
+            this.results = {questions: [], articles: [], threads: []};
+            return;
+        }
+        this.loading = true;
+        fetch('/search/suggestions?q=' + encodeURIComponent(this.query))
+            .then(res => res.json())
+            .then(data => {
+                setTimeout(() => {
+                    this.results = data;
+                    this.loading = false;
+                }, 1000);
+            });
+    }
+}" class="sticky top-4 z-50 max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <nav class="bg-white/90 backdrop-blur-xl border border-slate-200 shadow-sm rounded-full px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16 gap-4">
+
+            
+            <div class="flex items-center flex-shrink-0">
+                <a href="/">
+                    <span class="text-xl font-extrabold tracking-tight font-outfit text-slate-900">Know<span class="text-slate-400">Base</span></span>
+                </a>
+            </div>
+
+            
+            <div class="hidden lg:flex flex-1 items-center justify-center gap-6 px-8">
+                
+                <div class="flex items-center gap-1">
+                    <a href="/" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Home</a>
+                    <a href="/questions" class="px-3 py-2 rounded-full text-sm font-semibold transition-all bg-slate-100 text-slate-900">Q&amp;A</a>
+                    <a href="/articles" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Articles</a>
+                    <a href="/threads" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Forums</a>
+                    <a href="/leaderboard" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Leaderboard</a>
+                </div>
+
+                
+                <div class="flex-1 max-w-xs">
+                    <button @click="searchModalOpen = true; $nextTick(() => $refs.searchInput.focus())" class="w-full relative group flex items-center pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-400 hover:bg-white hover:border-slate-400 transition-all text-left">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        Search...
+                    </button>
+                </div>
+            </div>
+
+            
+            <div class="flex items-center flex-shrink-0 gap-2">
+                                    <a href="/login" class="text-sm font-semibold text-slate-500 hover:text-slate-900 px-4 py-2 rounded-full transition-all">Log in</a>
+                    <a href="/register" class="text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 px-5 py-2.5 rounded-full transition-all shadow-sm">Sign up</a>
+                
+                
+                <button @click="open = !open" class="md:hidden p-2 rounded-full text-slate-500 hover:bg-slate-100 transition-all">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path :class="{'hidden': open, 'inline-flex': !open}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path :class="{'hidden': !open, 'inline-flex': open}" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    
+    <div x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 -translate-y-2 scale-95"
+         class="md:hidden absolute top-[calc(100%+0.5rem)] left-4 right-4 bg-white border border-slate-100 rounded-3xl p-4 space-y-1 shadow-xl shadow-slate-200/50"
+         style="display: none;">
+        <div class="relative mb-3">
+            <button @click="searchModalOpen = true; open = false; $nextTick(() => $refs.searchInput.focus())" class="w-full flex items-center text-left pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-400 outline-none hover:border-slate-400 transition-all">
+                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                Search...
+            </button>
+        </div>
+        <a href="/" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Home</a>
+        <a href="/questions" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Q&amp;A</a>
+        <a href="/articles" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Articles</a>
+        <a href="/threads" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Forums</a>
+        <a href="/leaderboard" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Leaderboard</a>
+        <a href="/topics" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Topics</a>
+    </div>
+
+    
+    <div x-show="searchModalOpen" style="display: none;" class="fixed inset-0 z-[100] flex items-start justify-center pt-16 sm:pt-24 px-4" @keydown.escape.window="searchModalOpen = false">
+        <div x-show="searchModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" @click="searchModalOpen = false"></div>
+        
+        <div x-show="searchModalOpen" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 -translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 -translate-y-4"
+             class="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden ring-1 ring-slate-100"
+             @click.stop>
+             
+             <div class="flex items-center px-4 py-4 border-b border-slate-100">
+                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input x-ref="searchInput" x-model="query" @input.debounce.300ms="fetchResults()" @keydown.enter="window.location.href = '/search?q=' + encodeURIComponent(query)" type="text" placeholder="Search questions, articles, forums..." class="flex-1 bg-transparent border-0 focus:ring-0 text-base text-slate-900 px-4 outline-none placeholder:text-slate-400">
+                <div x-show="loading" class="h-4 w-4 rounded-full border-2 border-slate-200 border-t-slate-500 animate-spin mr-2" style="display:none;"></div>
+                <button @click="searchModalOpen = false" class="text-xs font-semibold text-slate-400 hover:text-slate-700 bg-slate-100 px-2 py-1 rounded">ESC</button>
+             </div>
+
+             <div class="max-h-[60vh] overflow-y-auto px-2 py-4" x-show="query.length > 0" style="display:none;">
+                 
+                 <!-- Shimmer Loading Skeleton for search results -->
+                 <div x-show="loading" class="space-y-6">
+                     <!-- Questions Skeleton -->
+                     <div>
+                         <div class="h-3 w-24 rounded bg-slate-200 shimmer mx-3 mb-3"></div>
+                         <div class="space-y-1">
+                             <div class="px-3 py-2.5"><div class="h-4 w-3/4 rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-2/3 rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-[85%] rounded bg-slate-100 shimmer"></div></div>
+                         </div>
+                     </div>
+                     
+                     <!-- Articles Skeleton -->
+                     <div>
+                         <div class="h-3 w-20 rounded bg-slate-200 shimmer mx-3 mb-3"></div>
+                         <div class="space-y-1">
+                             <div class="px-3 py-2.5"><div class="h-4 w-[70%] rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-4/5 rounded bg-slate-100 shimmer"></div></div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div x-show="!loading" class="space-y-4">
+                     
+                     <template x-if="results.questions && results.questions.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Questions</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.questions" :key="item.id">
+                                     <li>
+                                         <a :href="'/questions/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+                     
+                     <template x-if="results.articles && results.articles.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Articles</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.articles" :key="item.id">
+                                     <li>
+                                         <a :href="'/articles/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+
+                     <template x-if="results.threads && results.threads.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Forums</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.threads" :key="item.id">
+                                     <li>
+                                         <a :href="'/threads/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+                     
+                     <template x-if="(!results.questions || results.questions.length === 0) && (!results.articles || results.articles.length === 0) && (!results.threads || results.threads.length === 0) && !loading">
+                         <div class="text-center py-8">
+                             <p class="text-sm text-slate-500">No results found for "<span x-text="query" class="font-bold text-slate-900"></span>".</p>
+                         </div>
+                     </template>
+                 </div>
+             </div>
+             
+             <!-- Show before typing -->
+             <div class="px-6 py-12 text-center" x-show="query.length === 0">
+                 <p class="text-sm font-medium text-slate-400">Start typing to search across all content...</p>
+             </div>
+             
+        </div>
+    </div>
+</div>
+
+        <!-- Main Wrapper -->
+        <main class="flex-grow py-8 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <!-- Alert Notifications -->
+            
+            
+            <div class="animate-page-entrance">
+                <div class="space-y-8">
+        <!-- Topic / Back link -->
+        <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-800">
+            <a href="/questions" class="hover:underline">Questions</a>
+            <span>/</span>
+            <span>Technology</span>
+        </div>
+
+        <!-- Question Header & Vote wrapper -->
+        <div class="glass-panel p-6 rounded-2xl">
+            <div class="flex items-start space-x-6">
+                <!-- Voting Controls -->
+                <div class="flex flex-col items-center shrink-0 space-y-2 bg-white/50 p-2 rounded-xl border border-slate-200 shadow-sm">
+                                            <button class="p-1 text-slate-800 cursor-not-allowed">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7" />
+                            </svg>
+                        </button>
+                                        
+                    <span class="text-sm font-extrabold text-slate-800">16</span>
+                    
+                                            <button class="p-1 text-slate-800 cursor-not-allowed">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                                    </div>
+
+                <!-- Title & Body -->
+                <div class="flex-grow space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h1 class="text-2xl md:text-3xl font-extrabold font-outfit text-slate-800 leading-snug">
+                            How do I solve a quadratic equation using the quadratic formula?
+                                                    </h1>
+                        
+                        <!-- Bookmark/Delete controls -->
+                        <div class="flex items-center space-x-2">
+                            <!-- Report Button -->
+                            <div x-data="{ showReportModal: false }">
+    <button @click="showReportModal = true" class="p-2 border border-slate-200 text-slate-500 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors" title="Report Content">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+        </svg>
+    </button>
+
+    <div x-show="showReportModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div x-show="showReportModal" x-transition.opacity class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+            </div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div x-show="showReportModal" @click.away="showReportModal = false" x-transition.scale.origin.bottom class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-200">
+                <form action="/reports" method="POST">
+                    <input type="hidden" name="_token" value="H8zVCxkyyq6xS4s85LTQRkEcvCXHhRSYb6yjPQFb" autocomplete="off">                    <input type="hidden" name="reportable_type" value="App\Models\Question">
+                    <input type="hidden" name="reportable_id" value="2">
+                    
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-rose-50 sm:mx-0 sm:h-10 sm:w-10">
+                                <svg class="h-6 w-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-bold text-slate-900 font-outfit" id="modal-title">
+                                    Report Content
+                                </h3>
+                                <div class="mt-2 space-y-4">
+                                    <p class="text-sm text-slate-600">
+                                        Please provide a reason for reporting this content. Our moderators will review it shortly.
+                                    </p>
+                                    <div>
+                                        <select name="reason" class="block w-full border-slate-300 rounded-lg shadow-sm focus:ring-slate-900 focus:border-slate-900 sm:text-sm">
+                                            <option value="Spam">Spam</option>
+                                            <option value="Harassment or Abuse">Harassment or Abuse</option>
+                                            <option value="Inappropriate Content">Inappropriate Content</option>
+                                            <option value="Plagiarism">Plagiarism</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-slate-900 text-base font-bold text-white hover:bg-slate-800 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                            Submit Report
+                        </button>
+                        <button type="button" @click="showReportModal = false" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-bold text-slate-700 hover:bg-slate-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+                                                    </div>
+                    </div>
+
+                    <!-- Meta -->
+                    <div class="flex flex-wrap items-center space-x-3 text-xs text-slate-800">
+                        <span>Asked 3 months ago</span>
+                        <span>&bull;</span>
+                        <span>173 views</span>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="prose max-w-none text-slate-800 font-sans text-sm md:text-base pt-3">
+                        <p>My teacher showed us the quadratic formula ax² + bx + c = 0, but I don't understand how to plug in the values correctly. Can someone walk me through a step-by-step example?</p>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-1.5 pt-3 border-t border-slate-200">
+                                                    <a href="/tags/css" class="bg-slate-100 text-slate-800 hover:bg-slate-200 font-bold transition-colors text-xs px-2.5 py-0.5 rounded-lg">CSS</a>
+                                                    <a href="/tags/docker" class="bg-slate-100 text-slate-800 hover:bg-slate-200 font-bold transition-colors text-xs px-2.5 py-0.5 rounded-lg">Docker</a>
+                                                    <a href="/tags/agile" class="bg-slate-100 text-slate-800 hover:bg-slate-200 font-bold transition-colors text-xs px-2.5 py-0.5 rounded-lg">Agile</a>
+                                            </div>
+
+                    <!-- User Card -->
+                    <div class="flex justify-end pt-4">
+                        <div class="bg-white border border-slate-200 p-4 rounded-xl flex items-center space-x-3 w-64">
+                                                            <div class="h-9 w-9 rounded-lg bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-sm">
+                                    DR
+                                </div>
+                                                        <div>
+                                <a href="/u/qnanda" class="text-xs font-bold text-slate-800 hover:underline">Drishti Bahadur Mitra</a>
+                                <p class="text-[10px] text-slate-500 font-semibold">47 Reputation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Answers List -->
+        <div class="space-y-6 pt-6">
+            <h2 class="text-xl font-bold font-outfit">Answers (2)</h2>
+            
+            <div class="space-y-6">
+                                    <div class="glass-panel p-6 rounded-2xl flex items-start space-x-6 relative">
+                        
+                        <!-- Brainliest Answer Badge on side -->
+                        
+                        <!-- Voting Controls -->
+                        <div class="flex flex-col items-center shrink-0 space-y-2 bg-white/50 p-2 rounded-xl border border-slate-200 shadow-sm">
+                                                            <button class="p-1 text-slate-800 cursor-not-allowed">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7" />
+                                    </svg>
+                                </button>
+                                                        
+                            <span class="text-xs font-extrabold text-slate-800">5</span>
+                            
+                                                            <button class="p-1 text-slate-800 cursor-not-allowed">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                                    </div>
+
+                        <!-- Answer Body -->
+                        <div class="flex-grow space-y-4 pt-1 w-full min-w-0">
+                            <div class="prose max-w-none text-slate-800 font-sans text-sm leading-relaxed overflow-x-auto">
+                                <p>Great question! The key thing to understand here is that this concept builds on fundamental principles you've already learned. Let me walk you through it step by step.</p>
+                            </div>
+                            
+                            <!-- Thanks display -->
+                            
+                            <!-- Controls: Accept & Delete -->
+                            <div class="flex items-center justify-between border-t border-slate-200 pt-4">
+                                <div class="flex items-center space-x-2">
+                                                                    </div>
+
+                                <div class="flex items-center space-x-3">
+                                    <!-- Author meta -->
+                                    <div class="flex items-center space-x-2">
+                                                                                    <div class="h-6 w-6 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-[9px]">
+                                                AA
+                                            </div>
+                                                                                <div class="text-right flex items-center space-x-1.5">
+                                            <a href="/u/teena.mohabir" class="text-xs font-bold text-slate-800 hover:underline">Aayushi Sharaf</a>
+                                                                                        <p class="text-[9px] text-slate-500 ml-1">Answered 3 months ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                    <div class="glass-panel p-6 rounded-2xl flex items-start space-x-6 relative">
+                        
+                        <!-- Brainliest Answer Badge on side -->
+                        
+                        <!-- Voting Controls -->
+                        <div class="flex flex-col items-center shrink-0 space-y-2 bg-white/50 p-2 rounded-xl border border-slate-200 shadow-sm">
+                                                            <button class="p-1 text-slate-800 cursor-not-allowed">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7" />
+                                    </svg>
+                                </button>
+                                                        
+                            <span class="text-xs font-extrabold text-slate-800">2</span>
+                            
+                                                            <button class="p-1 text-slate-800 cursor-not-allowed">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                                    </div>
+
+                        <!-- Answer Body -->
+                        <div class="flex-grow space-y-4 pt-1 w-full min-w-0">
+                            <div class="prose max-w-none text-slate-800 font-sans text-sm leading-relaxed overflow-x-auto">
+                                <p>This is a classic concept that appears in many exams. The most important thing to remember is to always write down what you know first, then apply the formula.</p>
+                            </div>
+                            
+                            <!-- Thanks display -->
+                            
+                            <!-- Controls: Accept & Delete -->
+                            <div class="flex items-center justify-between border-t border-slate-200 pt-4">
+                                <div class="flex items-center space-x-2">
+                                                                    </div>
+
+                                <div class="flex items-center space-x-3">
+                                    <!-- Author meta -->
+                                    <div class="flex items-center space-x-2">
+                                                                                    <div class="h-6 w-6 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-[9px]">
+                                                KR
+                                            </div>
+                                                                                <div class="text-right flex items-center space-x-1.5">
+                                            <a href="/u/mohan41" class="text-xs font-bold text-slate-800 hover:underline">Krishna Lal</a>
+                                                                                        <p class="text-[9px] text-slate-500 ml-1">Answered 3 months ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            </div>
+        </div>
+
+        <!-- Post Answer Form -->
+                    <p class="text-sm text-slate-600">Please <a href="/login" class="text-slate-900 font-bold hover:underline">log in</a> to answer this question.</p>
+            </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-100 mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div class="flex flex-col md:flex-row items-start justify-between gap-8">
+                    <div>
+                        <p class="font-outfit font-extrabold text-slate-900 text-xl">Know<span class="text-slate-400">Base</span></p>
+                        <p class="text-slate-400 text-sm mt-1 max-w-xs">The student knowledge platform. Ask, answer, and grow together.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-x-12 gap-y-4">
+                        <div>
+                            <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Explore</p>
+                            <div class="flex flex-col gap-1.5">
+                                <a href="/questions" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Q&amp;A</a>
+                                <a href="/articles" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Articles</a>
+                                <a href="/threads" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Forums</a>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Community</p>
+                            <div class="flex flex-col gap-1.5">
+                                <a href="/topics" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Topics</a>
+                                <a href="/leaderboard" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Leaderboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+                    <p class="text-slate-400 text-xs">&copy; 2026 KnowBase. All rights reserved.</p>
+                    <p class="text-slate-300 text-xs">Made with love for students</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Livewire Scripts -->
+        
+
+        <!-- Lenis Smooth Scrolling -->
+        <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    direction: 'vertical',
+                    gestureDirection: 'vertical',
+                    smooth: true,
+                    mouseMultiplier: 1,
+                    smoothTouch: false,
+                    touchMultiplier: 2,
+                    infinite: false,
+                });
+
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+
+                requestAnimationFrame(raf);
+            });
+        </script>
+    </body>
+</html>

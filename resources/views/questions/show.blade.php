@@ -54,7 +54,15 @@
                 <!-- Title & Body -->
                 <div class="flex-grow space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-2">
-                        <h1 class="text-2xl md:text-3xl font-extrabold font-outfit text-slate-800 leading-snug">{{ $question->title }}</h1>
+                        <h1 class="text-2xl md:text-3xl font-extrabold font-outfit text-slate-800 leading-snug">
+                            {{ $question->title }}
+                            @if($question->bounty_amount > 0 && $question->status === 'open')
+                                <span class="inline-flex items-center gap-1.5 align-middle ml-2 px-3 py-1 bg-amber-100 text-amber-700 text-sm font-black rounded-lg shadow-sm border border-amber-200">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    +{{ $question->bounty_amount }} XP Bounty
+                                </span>
+                            @endif
+                        </h1>
                         
                         <!-- Bookmark/Delete controls -->
                         <div class="flex items-center space-x-2">
@@ -188,10 +196,43 @@
                         </div>
 
                         <!-- Answer Body -->
-                        <div class="flex-grow space-y-4 pt-1">
-                            <div class="prose max-w-none text-slate-800 font-sans text-sm leading-relaxed">
+                        <div class="flex-grow space-y-4 pt-1 w-full min-w-0">
+                            <div class="prose max-w-none text-slate-800 font-sans text-sm leading-relaxed overflow-x-auto">
                                 {!! $answer->body !!}
                             </div>
+                            
+                            <!-- Thanks display -->
+                            @if($answer->thanks->count() > 0)
+                                <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">
+                                    <div class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 w-full mb-1 flex items-center gap-1">
+                                        <svg class="h-3 w-3 text-rose-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+                                        Appreciation
+                                    </div>
+                                    @foreach($answer->thanks->take(3) as $thank)
+                                        <div class="inline-flex items-center gap-2 bg-rose-50/50 border border-rose-100 px-3 py-1.5 rounded-xl">
+                                            @if($thank->user->avatar)
+                                                <img src="{{ asset('storage/' . $thank->user->avatar) }}" class="h-5 w-5 rounded-md object-cover">
+                                            @else
+                                                <div class="h-5 w-5 rounded-md bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-[9px]">{{ strtoupper(substr($thank->user->name, 0, 2)) }}</div>
+                                            @endif
+                                            <div class="text-xs">
+                                                <span class="font-bold text-slate-700">{{ $thank->user->name }}</span>
+                                                @if($thank->xp_amount > 0)
+                                                    <span class="text-[10px] font-black text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded ml-1">+{{ $thank->xp_amount }} XP</span>
+                                                @endif
+                                                @if($thank->message)
+                                                    <span class="text-slate-500 italic ml-1">"{{ Str::limit($thank->message, 40) }}"</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    @if($answer->thanks->count() > 3)
+                                        <div class="inline-flex items-center justify-center bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-500">
+                                            +{{ $answer->thanks->count() - 3 }} more
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
 
                             <!-- Controls: Accept & Delete -->
                             <div class="flex items-center justify-between border-t border-slate-200 pt-4">
@@ -208,6 +249,53 @@
                                                     <span>Mark as Brainliest</span>
                                                 </button>
                                             </form>
+                                        @endif
+                                        
+                                        <!-- Thank You Button -->
+                                        @if(auth()->id() !== $answer->user_id)
+                                            <div x-data="{ open: false }">
+                                                <button @click="open = true" class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 font-bold hover:bg-rose-100 rounded-xl text-xs transition-all border border-transparent">
+                                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+                                                    <span>Say Thanks</span>
+                                                </button>
+                                                
+                                                <!-- Thank You Modal -->
+                                                <div x-show="open" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                                                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                                        <div x-show="open" x-transition.opacity class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" @click="open = false"></div>
+                                                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                                                        <div x-show="open" x-transition.scale class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full p-6">
+                                                            <div class="flex justify-between items-center mb-4">
+                                                                <h3 class="text-lg font-black font-outfit text-slate-900" id="modal-title">Say Thanks to {{ $answer->user->name }}</h3>
+                                                                <button @click="open = false" class="text-slate-400 hover:text-slate-900 transition-colors">
+                                                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                </button>
+                                                            </div>
+                                                            <form action="{{ route('thanks.store', $answer->id) }}" method="POST" class="space-y-4">
+                                                                @csrf
+                                                                <div>
+                                                                    <label class="block text-xs font-bold text-slate-700 mb-1">Message (Optional)</label>
+                                                                    <textarea name="message" rows="2" class="w-full rounded-xl border-slate-200 bg-slate-50 focus:ring-slate-900 focus:border-slate-900 text-sm p-3" placeholder="Thanks for the great explanation!"></textarea>
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-xs font-bold text-slate-700 mb-1">Tip XP (Optional)</label>
+                                                                    <select name="xp_amount" class="w-full rounded-xl border-slate-200 bg-slate-50 focus:ring-slate-900 focus:border-slate-900 text-sm p-3">
+                                                                        <option value="0">No Tip</option>
+                                                                        <option value="5">5 XP</option>
+                                                                        <option value="10">10 XP</option>
+                                                                        <option value="25">25 XP</option>
+                                                                    </select>
+                                                                    <p class="text-[10px] text-slate-500 mt-1">This will be deducted from your current balance: {{ auth()->user()->reputation }} XP</p>
+                                                                </div>
+                                                                <div class="mt-5 flex gap-3">
+                                                                    <button type="button" @click="open = false" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl transition-colors">Cancel</button>
+                                                                    <button type="submit" class="flex-1 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl transition-colors shadow-sm">Send Thanks</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @endif
                                     @endauth
                                 </div>

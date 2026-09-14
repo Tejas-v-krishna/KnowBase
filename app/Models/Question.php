@@ -21,13 +21,20 @@ class Question extends Model
         'views_count',
         'answers_count',
         'votes_count',
+        'bounty_amount',
     ];
 
     protected $casts = [
         'views_count' => 'integer',
         'answers_count' => 'integer',
         'votes_count' => 'integer',
+        'bounty_amount' => 'integer',
     ];
+
+    public function scopeWithBounty($query)
+    {
+        return $query->where('bounty_amount', '>', 0)->where('status', 'open');
+    }
 
     public function toSearchableArray()
     {

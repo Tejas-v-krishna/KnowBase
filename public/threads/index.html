@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="H8zVCxkyyq6xS4s85LTQRkEcvCXHhRSYb6yjPQFb">
+
+        <title>Laravel</title>
+
+        <!-- Trix Editor CDN -->
+        <link rel="stylesheet" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+        <script src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
+
+        <!-- Scripts & Tailwind -->
+        <link rel="preload" as="style" href="/build/assets/app-D7uogfcc.css" /><link rel="modulepreload" as="script" href="/build/assets/app-DJrsl1FZ.js" /><link rel="stylesheet" href="/build/assets/app-D7uogfcc.css" data-navigate-track="reload" /><script type="module" src="/build/assets/app-DJrsl1FZ.js" data-navigate-track="reload"></script>
+        <!-- Livewire Styles -->
+        
+    </head>
+    <body class="font-sans antialiased text-slate-700 bg-white flex flex-col min-h-screen">
+        <div x-data="{ 
+    open: false, 
+    userDropdown: false, 
+    searchModalOpen: false,
+    query: '',
+    loading: false,
+    results: {questions: [], articles: [], threads: []},
+    fetchResults() {
+        if(this.query.length < 2) {
+            this.results = {questions: [], articles: [], threads: []};
+            return;
+        }
+        this.loading = true;
+        fetch('/search/suggestions?q=' + encodeURIComponent(this.query))
+            .then(res => res.json())
+            .then(data => {
+                setTimeout(() => {
+                    this.results = data;
+                    this.loading = false;
+                }, 1000);
+            });
+    }
+}" class="sticky top-4 z-50 max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <nav class="bg-white/90 backdrop-blur-xl border border-slate-200 shadow-sm rounded-full px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16 gap-4">
+
+            
+            <div class="flex items-center flex-shrink-0">
+                <a href="/">
+                    <span class="text-xl font-extrabold tracking-tight font-outfit text-slate-900">Know<span class="text-slate-400">Base</span></span>
+                </a>
+            </div>
+
+            
+            <div class="hidden lg:flex flex-1 items-center justify-center gap-6 px-8">
+                
+                <div class="flex items-center gap-1">
+                    <a href="/" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Home</a>
+                    <a href="/questions" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Q&amp;A</a>
+                    <a href="/articles" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Articles</a>
+                    <a href="/threads" class="px-3 py-2 rounded-full text-sm font-semibold transition-all bg-slate-100 text-slate-900">Forums</a>
+                    <a href="/leaderboard" class="px-3 py-2 rounded-full text-sm font-semibold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50">Leaderboard</a>
+                </div>
+
+                
+                <div class="flex-1 max-w-xs">
+                    <button @click="searchModalOpen = true; $nextTick(() => $refs.searchInput.focus())" class="w-full relative group flex items-center pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-400 hover:bg-white hover:border-slate-400 transition-all text-left">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        Search...
+                    </button>
+                </div>
+            </div>
+
+            
+            <div class="flex items-center flex-shrink-0 gap-2">
+                                    <a href="/login" class="text-sm font-semibold text-slate-500 hover:text-slate-900 px-4 py-2 rounded-full transition-all">Log in</a>
+                    <a href="/register" class="text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 px-5 py-2.5 rounded-full transition-all shadow-sm">Sign up</a>
+                
+                
+                <button @click="open = !open" class="md:hidden p-2 rounded-full text-slate-500 hover:bg-slate-100 transition-all">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path :class="{'hidden': open, 'inline-flex': !open}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path :class="{'hidden': !open, 'inline-flex': open}" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    
+    <div x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 -translate-y-2 scale-95"
+         class="md:hidden absolute top-[calc(100%+0.5rem)] left-4 right-4 bg-white border border-slate-100 rounded-3xl p-4 space-y-1 shadow-xl shadow-slate-200/50"
+         style="display: none;">
+        <div class="relative mb-3">
+            <button @click="searchModalOpen = true; open = false; $nextTick(() => $refs.searchInput.focus())" class="w-full flex items-center text-left pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-400 outline-none hover:border-slate-400 transition-all">
+                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                Search...
+            </button>
+        </div>
+        <a href="/" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Home</a>
+        <a href="/questions" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Q&amp;A</a>
+        <a href="/articles" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Articles</a>
+        <a href="/threads" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Forums</a>
+        <a href="/leaderboard" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Leaderboard</a>
+        <a href="/topics" class="block px-4 py-3 rounded-full text-sm font-semibold text-slate-700 hover:bg-slate-50">Topics</a>
+    </div>
+
+    
+    <div x-show="searchModalOpen" style="display: none;" class="fixed inset-0 z-[100] flex items-start justify-center pt-16 sm:pt-24 px-4" @keydown.escape.window="searchModalOpen = false">
+        <div x-show="searchModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" @click="searchModalOpen = false"></div>
+        
+        <div x-show="searchModalOpen" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 -translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 -translate-y-4"
+             class="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden ring-1 ring-slate-100"
+             @click.stop>
+             
+             <div class="flex items-center px-4 py-4 border-b border-slate-100">
+                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input x-ref="searchInput" x-model="query" @input.debounce.300ms="fetchResults()" @keydown.enter="window.location.href = '/search?q=' + encodeURIComponent(query)" type="text" placeholder="Search questions, articles, forums..." class="flex-1 bg-transparent border-0 focus:ring-0 text-base text-slate-900 px-4 outline-none placeholder:text-slate-400">
+                <div x-show="loading" class="h-4 w-4 rounded-full border-2 border-slate-200 border-t-slate-500 animate-spin mr-2" style="display:none;"></div>
+                <button @click="searchModalOpen = false" class="text-xs font-semibold text-slate-400 hover:text-slate-700 bg-slate-100 px-2 py-1 rounded">ESC</button>
+             </div>
+
+             <div class="max-h-[60vh] overflow-y-auto px-2 py-4" x-show="query.length > 0" style="display:none;">
+                 
+                 <!-- Shimmer Loading Skeleton for search results -->
+                 <div x-show="loading" class="space-y-6">
+                     <!-- Questions Skeleton -->
+                     <div>
+                         <div class="h-3 w-24 rounded bg-slate-200 shimmer mx-3 mb-3"></div>
+                         <div class="space-y-1">
+                             <div class="px-3 py-2.5"><div class="h-4 w-3/4 rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-2/3 rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-[85%] rounded bg-slate-100 shimmer"></div></div>
+                         </div>
+                     </div>
+                     
+                     <!-- Articles Skeleton -->
+                     <div>
+                         <div class="h-3 w-20 rounded bg-slate-200 shimmer mx-3 mb-3"></div>
+                         <div class="space-y-1">
+                             <div class="px-3 py-2.5"><div class="h-4 w-[70%] rounded bg-slate-100 shimmer"></div></div>
+                             <div class="px-3 py-2.5"><div class="h-4 w-4/5 rounded bg-slate-100 shimmer"></div></div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div x-show="!loading" class="space-y-4">
+                     
+                     <template x-if="results.questions && results.questions.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Questions</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.questions" :key="item.id">
+                                     <li>
+                                         <a :href="'/questions/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+                     
+                     <template x-if="results.articles && results.articles.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Articles</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.articles" :key="item.id">
+                                     <li>
+                                         <a :href="'/articles/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+
+                     <template x-if="results.threads && results.threads.length > 0">
+                         <div class="mb-4">
+                             <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Forums</h3>
+                             <ul class="space-y-1">
+                                 <template x-for="item in results.threads" :key="item.id">
+                                     <li>
+                                         <a :href="'/threads/' + item.slug" class="block px-3 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors" x-text="item.title"></a>
+                                     </li>
+                                 </template>
+                             </ul>
+                         </div>
+                     </template>
+                     
+                     <template x-if="(!results.questions || results.questions.length === 0) && (!results.articles || results.articles.length === 0) && (!results.threads || results.threads.length === 0) && !loading">
+                         <div class="text-center py-8">
+                             <p class="text-sm text-slate-500">No results found for "<span x-text="query" class="font-bold text-slate-900"></span>".</p>
+                         </div>
+                     </template>
+                 </div>
+             </div>
+             
+             <!-- Show before typing -->
+             <div class="px-6 py-12 text-center" x-show="query.length === 0">
+                 <p class="text-sm font-medium text-slate-400">Start typing to search across all content...</p>
+             </div>
+             
+        </div>
+    </div>
+</div>
+
+        <!-- Main Wrapper -->
+        <main class="flex-grow py-8 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <!-- Alert Notifications -->
+            
+            
+            <div class="animate-page-entrance">
+                <div class="space-y-6">
+
+        
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-100">
+            <div>
+                <h1 class="text-2xl font-extrabold font-outfit text-slate-900">Community Discussion Forums</h1>
+                <p class="text-slate-400 text-sm mt-0.5">Share ideas, announcements, and engage with other members.</p>
+            </div>
+            <a href="/threads/create" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-sm shrink-0">
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+                Start a Discussion
+            </a>
+        </div>
+
+        
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                                    <a href="/threads?filter=all"
+                       class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-slate-900 shadow-sm">
+                        All Discussions
+                    </a>
+                                    <a href="/threads?filter=pinned"
+                       class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-500 hover:text-slate-700">
+                        Pinned
+                    </a>
+                                    <a href="/threads?filter=resolved"
+                       class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-500 hover:text-slate-700">
+                        Resolved
+                    </a>
+                                            </div>
+
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-400 font-medium">Sort:</span>
+                <select onchange="window.location.href=this.value"
+                        class="border border-slate-200 bg-white text-xs font-semibold text-slate-700 px-3 py-1.5 rounded-xl outline-none focus:ring-2 focus:ring-slate-200 focus:border-slate-400 transition-all cursor-pointer">
+                    <option value="/threads?sort=newest" selected>Latest</option>
+                    <option value="/threads?sort=replies" >Most Replies</option>
+                    <option value="/threads?sort=views" >Most Viewed</option>
+                </select>
+            </div>
+        </div>
+
+        
+        <div class="space-y-4">
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        MO
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Education</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/active-recall-vs-re-reading-what-is-the-most-effective-study-method">
+                                    Active Recall vs. Re-reading: What is the most effective study method?
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                I&#039;ve been reading cognitive psychology papers and they all praise Active Recall and Spaced Repetition over highlighted re-reading. How do you implement active recall in your daily study routine? Do you use Anki, flashcards, or write summary questions?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/borah.zahir" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Moti Sodhi</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">3</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">290</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        PR
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                    <span class="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-lg border border-emerald-200/60">
+                                        Resolved
+                                    </span>
+                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Personal Development</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/how-to-build-a-consistent-morning-routine-for-productivity">
+                                    How to build a consistent morning routine for productivity
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                I usually wake up tired and rush straight to my desk. I want to build a mindful morning routine (maybe involving meditation, reading, or light exercise) that sets a positive, high-energy tone for the day. What does your ideal morning look like, and how do you stick to it?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/moderator" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Priya Sharma</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">31</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        GA
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                    <span class="bg-amber-50 text-amber-700 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-lg border border-amber-200/60 flex items-center gap-1">
+                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M14.707 9.293a1 1 0 00-1.414 0L12.586 10.414 10 7.828V4a1 1 0 00-2 0v3.828L5.414 10.414l-.707-.707a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0L8.586 11.293l2.586 2.586V17a1 1 0 102 0v-3.172l1.293-1.293a1 1 0 000-1.414L15.707 9.293z" clip-rule="evenodd"/></svg>
+                                        Pinned
+                                    </span>
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Science</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/tips-for-memorizing-the-periodic-table-of-elements">
+                                    Tips for memorizing the Periodic Table of Elements
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                I have a chemistry mid-term coming up next week and I need to memorize the first 20 elements of the periodic table along with their atomic numbers. Does anyone have any fun mnemonics, songs, or visual techniques that worked for you?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/indrani.tella" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Ganesh Chopra</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">3</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">147</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        MO
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Education</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/how-to-apply-for-international-student-scholarships">
+                                    How to apply for international student scholarships?
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                Hello everyone! I&#039;m planning to apply for master&#039;s programs in Europe and Canada next year. The tuition fees are quite high, so I am looking for reputable international scholarships or grants. What is the application process like, and what makes a statement of purpose stand out?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/drishti53" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Mohan Sagar</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">259</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        DR
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Design</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/uiux-case-study-critique-my-student-portfolio-project">
+                                    UI/UX Case Study: Critique my student portfolio project!
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                Hey community! I just finished designing my first high-fidelity mobile application mockup for a local library book-booking app. I would love to get your honest critique on my spacing, typography hierarchy, and accessibility contrast choices. Please let me know what you think!
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/qnanda" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Drishti Bahadur Mitra</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">148</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        KR
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                    <span class="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-lg border border-emerald-200/60">
+                                        Resolved
+                                    </span>
+                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Personal Development</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/how-to-overcome-procrastination-using-the-pomodoro-technique">
+                                    How to overcome procrastination using the Pomodoro Technique
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                I always find myself delaying assignments until the night before they are due. I started trying the Pomodoro Technique (25 mins work, 5 mins break) yesterday and it helped a bit. How do you stay disciplined during those 25 minutes? Any app recommendations?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/mohan41" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Krishna Lal</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">3</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">290</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        MO
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Business</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/the-rise-of-micro-credentials-are-they-worth-it">
+                                    The rise of Micro-credentials: Are they worth it?
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                With online certificates from Coursera, Google, and Harvard becoming so common, do employers actually value micro-credentials on resumes? Has anyone successfully landed an internship or job primarily because of a specialized online certification?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/jaish" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Mohammad Jaish</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">130</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        FE
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Arts</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/getting-started-with-digital-painting-wacom-vs-ipad-pro">
+                                    Getting started with Digital Painting: Wacom vs. iPad Pro
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                I want to transition from traditional sketching to digital painting. I am debating whether to purchase a Wacom drawing tablet for my laptop or invest in an iPad Pro with an Apple Pencil. Which device offers a better learning curve and experience for student artists?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/mohanlal37" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Feroz Majumdar</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">245</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        AL
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Health</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/best-ergonomic-setups-for-long-study-and-coding-sessions">
+                                    Best ergonomic setups for long study and coding sessions
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                Lately, I&#039;ve been experiencing lower back and wrist pain after studying at my desk for more than 4 hours. What are some budget-friendly ergonomic chairs, laptop stands, seat cushions, or posture habits that you all use to stay healthy and pain-free during exam seasons?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/bera.naresh" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Albert Shan</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">3</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">226</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        FE
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                    <span class="bg-amber-50 text-amber-700 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-lg border border-amber-200/60 flex items-center gap-1">
+                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M14.707 9.293a1 1 0 00-1.414 0L12.586 10.414 10 7.828V4a1 1 0 00-2 0v3.828L5.414 10.414l-.707-.707a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0L8.586 11.293l2.586 2.586V17a1 1 0 102 0v-3.172l1.293-1.293a1 1 0 000-1.414L15.707 9.293z" clip-rule="evenodd"/></svg>
+                                        Pinned
+                                    </span>
+                                                                                                    <span class="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-lg border border-emerald-200/60">
+                                        Resolved
+                                    </span>
+                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Technology</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/how-to-get-started-with-git-and-github-a-beginners-guide">
+                                    How to get started with Git and GitHub? A beginner&#039;s guide
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                Hey everyone! I often see students struggling with version control when working on group projects. What are the best resources, interactive tutorials, or cheatsheets you&#039;ve found to master the basic Git commands (push, pull, commit, branch) without breaking your repository? Let&#039;s compile a list!
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/mohanlal37" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Feroz Majumdar</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">3</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">84</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        AL
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Arts</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/the-role-of-art-and-design-in-modern-marketing-campaigns">
+                                    The role of art and design in modern marketing campaigns
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                Art isn&#039;t just for galleries! From branding to commercials, visual design shapes how consumers perceive companies. Let&#039;s discuss some of the most visually stunning or creative marketing campaigns you&#039;ve seen recently, and analyze why their design was so effective.
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/bera.naresh" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Albert Shan</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">175</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        BI
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Technology</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/why-is-python-so-popular-for-data-science-and-machine-learning">
+                                    Why is Python so popular for Data Science and Machine Learning?
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                I&#039;m starting my data science journey and noticed that almost every course uses Python instead of languages like Java or C++. Can someone explain what makes Python&#039;s ecosystem, libraries (Pandas, NumPy, Scikit-Learn), and syntax so well-suited for statistical analysis?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/bpurohit" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Binoya Kumar Chia</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">184</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        AL
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                    <span class="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-lg border border-emerald-200/60">
+                                        Resolved
+                                    </span>
+                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Science</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/understanding-the-difference-between-mitosis-and-meiosis">
+                                    Understanding the difference between Mitosis and Meiosis
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                I keep getting confused between the phases of cell division. Can someone provide a simple comparison of Mitosis vs. Meiosis? Specifically, how do the chromosome counts and genetic variations differ between the daughter cells in each process?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/bera.naresh" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Albert Shan</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">174</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        FE
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Design</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/skeuomorphism-vs-flat-design-the-evolution-of-user-interfaces">
+                                    Skeuomorphism vs. Flat Design: The evolution of user interfaces
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                Remember when iOS had leather textures and glossy buttons? Now everything is flat and minimal. Do you think we will ever see a return to realistic skeuomorphic textures, or is flat/neumorphic design here to stay? What are the pros and cons of each style?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/mohanlal37" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Feroz Majumdar</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">259</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                            <div class="group relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-slate-200/80 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    
+                    
+                    <div class="flex items-start space-x-4 min-w-0 flex-grow">
+                        
+                        <div class="shrink-0 pt-0.5">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xs uppercase select-none border border-black/20 shadow-sm h-10 w-10 rounded-2xl border border-slate-100">
+        MO
+    </div>
+
+
+
+                        </div>
+
+                        
+                        <div class="min-w-0 space-y-1.5 flex-grow">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                                    <span class="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-lg border border-emerald-200/60">
+                                        Resolved
+                                    </span>
+                                                                <span class="px-2 py-0.5 bg-slate-50 text-slate-500 rounded-md font-bold text-[9px] uppercase tracking-wider">Business</span>
+                            </div>
+                            
+                            <h3 class="text-base font-bold font-outfit text-slate-900 group-hover:text-black transition-colors leading-snug truncate">
+                                <a href="/threads/what-is-the-difference-between-a-sole-proprietorship-and-an-llc">
+                                    What is the difference between a Sole Proprietorship and an LLC?
+                                </a>
+                            </h3>
+
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 pr-4">
+                                I am planning to launch a small freelance graphic design business this summer. I&#039;m trying to understand the legal, liability, and tax differences between operating as a Sole Proprietor versus registering as a Limited Liability Company (LLC). Any business majors here who can break it down simply?
+                            </p>
+                            
+                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+                                <span>By <a href="/u/borah.zahir" class="font-bold text-slate-600 hover:text-black hover:underline transition-colors">Moti Sodhi</a></span>
+                                <span>&bull;</span>
+                                <span>3 months ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex items-center space-x-6 text-slate-500 sm:shrink-0 pl-14 sm:pl-0">
+                        <div class="flex flex-col items-center bg-slate-50 rounded-2xl py-1.5 px-3 border border-slate-100/50 min-w-[60px]">
+                            <span class="text-sm font-black text-slate-800 leading-none">2</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-1">replies</span>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span class="text-xs font-bold text-slate-600">144</span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">views</span>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+
+        
+        
+    </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-100 mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div class="flex flex-col md:flex-row items-start justify-between gap-8">
+                    <div>
+                        <p class="font-outfit font-extrabold text-slate-900 text-xl">Know<span class="text-slate-400">Base</span></p>
+                        <p class="text-slate-400 text-sm mt-1 max-w-xs">The student knowledge platform. Ask, answer, and grow together.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-x-12 gap-y-4">
+                        <div>
+                            <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Explore</p>
+                            <div class="flex flex-col gap-1.5">
+                                <a href="/questions" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Q&amp;A</a>
+                                <a href="/articles" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Articles</a>
+                                <a href="/threads" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Forums</a>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Community</p>
+                            <div class="flex flex-col gap-1.5">
+                                <a href="/topics" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Topics</a>
+                                <a href="/leaderboard" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Leaderboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+                    <p class="text-slate-400 text-xs">&copy; 2026 KnowBase. All rights reserved.</p>
+                    <p class="text-slate-300 text-xs">Made with love for students</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Livewire Scripts -->
+        
+
+        <!-- Lenis Smooth Scrolling -->
+        <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    direction: 'vertical',
+                    gestureDirection: 'vertical',
+                    smooth: true,
+                    mouseMultiplier: 1,
+                    smoothTouch: false,
+                    touchMultiplier: 2,
+                    infinite: false,
+                });
+
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+
+                requestAnimationFrame(raf);
+            });
+        </script>
+    </body>
+</html>

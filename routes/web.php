@@ -36,6 +36,12 @@ Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->nam
 // AI Assistant
 Route::post('/ai/ask', [\App\Http\Controllers\AiAssistantController::class, 'ask'])->name('ai.ask');
 
+// Activity Feed (JSON for polling)
+Route::get('/api/activity-feed', [\App\Http\Controllers\ActivityFeedController::class, 'index'])->name('activities.feed');
+
+// Challenges (JSON)
+Route::get('/api/challenges', [\App\Http\Controllers\ChallengeController::class, 'index'])->name('challenges.index');
+
 // Trivia Challenge
 Route::get('/trivia/random', [\App\Http\Controllers\TriviaController::class, 'random'])->name('trivia.random');
 Route::post('/trivia/verify', [\App\Http\Controllers\TriviaController::class, 'verify'])->name('trivia.verify');
@@ -90,6 +96,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/threads/{slug}', [ThreadController::class, 'destroy'])->name('threads.destroy');
     Route::post('/threads/{id}/replies', [ReplyController::class, 'store'])->name('replies.store');
     Route::delete('/replies/{id}', [ReplyController::class, 'destroy'])->name('replies.destroy');
+
+    // Thank You System
+    Route::post('/answers/{id}/thank', [\App\Http\Controllers\ThankController::class, 'store'])->name('thanks.store');
 
     // Comments
     Route::post('/comments/{type}/{id}', [CommentController::class, 'store'])->name('comments.store');

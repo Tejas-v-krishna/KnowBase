@@ -5,6 +5,7 @@ use App\Http\Requests\StoreQuestionRequest;
 use App\Models\Question;
 use App\Models\Topic;
 use App\Models\Tag;
+use App\Models\Activity;
 use App\Services\ReputationService;
 use App\Services\MentionService;
 use Illuminate\Http\Request;
@@ -26,6 +27,8 @@ class QuestionController extends Controller
             $query->where('status', 'resolved');
         } elseif ($filter === 'my') {
             $query->where('user_id', auth()->id());
+        } elseif ($filter === 'bounty') {
+            $query->where('bounty_amount', '>', 0);
         }
 
         // Sorting
@@ -33,6 +36,8 @@ class QuestionController extends Controller
             $query->orderBy('votes_count', 'desc');
         } elseif ($sort === 'views') {
             $query->orderBy('views_count', 'desc');
+        } elseif ($sort === 'bounty') {
+            $query->orderBy('bounty_amount', 'desc');
         } else {
             $query->latest();
         }
@@ -57,6 +62,19 @@ class QuestionController extends Controller
         $data = $request->validated();
         $data['user_id'] = auth()->id();
 
+        // Handle bounty
+        $bountyAmount = (int) ($request->input('bounty_amount', 0));
+        if ($bountyAmount > 0) {
+            if (!in_array($bountyAmount, [25, 50, 100, 200])) {
+                return back()->with('error', 'Invalid bounty amount.');
+            }
+            $totalCost = 10 + $bountyAmount;
+            if (auth()->user()->reputation < $totalCost) {
+                return back()->with('error', "You need at least {$totalCost} XP (10 to ask + {$bountyAmount} bounty).");
+            }
+            $data['bounty_amount'] = $bountyAmount;
+        }
+
         $question = Question::create($data);
 
         // Process mentions
@@ -77,15 +95,33 @@ class QuestionController extends Controller
             $question->tags()->sync($tagIds);
         }
 
-        ReputationService::subtractPoints(auth()->user(), 10);
+        // Deduct XP: 10 for asking + bounty amount
+        $totalDeduction = 10 + $bountyAmount;
+        ReputationService::subtractPoints(auth()->user(), $totalDeduction);
+
+        // Log activity
+        Activity::create([
+            'user_id' => auth()->id(),
+            'description' => $bountyAmount > 0
+                ? 'asked a ' . $bountyAmount . ' XP bounty question: ' . Str::limit($question->title, 60)
+                : 'asked: ' . Str::limit($question->title, 60),
+            'type' => 'question_asked',
+            'subject_id' => $question->id,
+            'subject_type' => get_class($question),
+        ]);
+
+        $successMsg = 'Question posted successfully! 10 XP deducted.';
+        if ($bountyAmount > 0) {
+            $successMsg = "Question posted with {$bountyAmount} XP bounty! " . ($totalDeduction) . " XP total deducted.";
+        }
 
         return redirect()->route('questions.show', $question->slug)
-            ->with('success', 'Question posted successfully! 10 XP deducted.');
+            ->with('success', $successMsg);
     }
 
     public function show($slug)
     {
-        $question = Question::where('slug', $slug)->with(['user', 'topic', 'tags', 'answers.user', 'answers.votes'])->firstOrFail();
+        $question = Question::where('slug', $slug)->with(['user', 'topic', 'tags', 'answers.user', 'answers.votes', 'answers.thanks'])->firstOrFail();
         $question->increment('views_count');
 
         return view('questions.show', compact('question'));
@@ -100,5 +136,6 @@ class QuestionController extends Controller
         return redirect()->route('questions.index')->with('success', 'Question deleted successfully.');
     }
 }
+
 
 

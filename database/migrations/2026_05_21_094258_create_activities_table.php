@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('type'); // e.g., 'created_article', 'earned_badge'
-            $table->morphs('subject'); // e.g., Article, Badge, Question
+            $table->nullableMorphs('subject'); // e.g., Article, Badge, Question
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

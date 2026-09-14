@@ -54,5 +54,23 @@ class UserSeeder extends Seeder
 
         // Regular users
         User::factory()->count(10)->create();
+
+        // Seed random activities for the last 365 days to populate the heatmap
+        $allUsers = User::all();
+        $activityTypes = ['question_asked', 'answer_posted', 'bounty_won', 'badge_earned', 'article_created'];
+        
+        foreach ($allUsers as $user) {
+            // Give each user 50 to 150 random activities scattered across the last 365 days
+            $activityCount = rand(50, 150);
+            for ($i = 0; $i < $activityCount; $i++) {
+                $createdAt = now()->subDays(rand(0, 364))->subHours(rand(0, 23))->subMinutes(rand(0, 59));
+                \App\Models\Activity::create([
+                    'user_id' => $user->id,
+                    'type' => $activityTypes[array_rand($activityTypes)],
+                    'created_at' => $createdAt,
+                    'updated_at' => $createdAt,
+                ]);
+            }
+        }
     }
 }

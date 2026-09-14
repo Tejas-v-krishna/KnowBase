@@ -28,6 +28,49 @@
                         </p>
                     @endif
 
+                    <!-- XP Progress Ring -->
+                    <div class="mt-5 flex flex-col items-center w-full pt-4 border-t border-slate-100">
+                        <div class="relative flex items-center justify-center w-28 h-28">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 112 112">
+                                <circle
+                                    class="text-slate-100"
+                                    stroke-width="6"
+                                    stroke="currentColor"
+                                    fill="transparent"
+                                    r="45"
+                                    cx="56"
+                                    cy="56"
+                                />
+                                <circle
+                                    class="text-slate-900 transition-all duration-500 ease-out"
+                                    stroke-width="6"
+                                    stroke-dasharray="282.74"
+                                    stroke-dashoffset="{{ 282.74 - (282.74 * $progressPercentage) / 100 }}"
+                                    stroke-linecap="round"
+                                    stroke="currentColor"
+                                    fill="transparent"
+                                    r="45"
+                                    cx="56"
+                                    cy="56"
+                                />
+                            </svg>
+                            <div class="absolute flex flex-col items-center justify-center text-center">
+                                <span class="text-xl font-black font-outfit text-slate-900 leading-none">{{ number_format($user->reputation) }}</span>
+                                <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Total XP</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <span class="text-xs font-black text-slate-900 uppercase tracking-wider block">{{ $currentRank }}</span>
+                            <span class="text-[10px] font-bold text-slate-400 block mt-0.5">
+                                @if($progressPercentage < 100)
+                                    {{ $xpTarget - $user->reputation }} XP to {{ $nextRank }}
+                                @else
+                                    Ultimate Rank Achieved!
+                                @endif
+                            </span>
+                        </div>
+                    </div>
+
                     <div class="mt-6 w-full pt-6 border-t border-slate-100 flex justify-around text-center">
                         <div>
                             <span class="block text-lg font-bold text-slate-900">{{ $user->articles()->where('status', 'published')->count() }}</span>
@@ -125,6 +168,81 @@
 
         <!-- Main Content Area -->
         <div class="lg:col-span-2 space-y-6">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Streak</span>
+                    <div class="flex items-baseline gap-1 mt-2">
+                        <span class="text-xl font-black font-outfit text-slate-900">{{ $user->streak ?? 0 }}</span>
+                        <span class="text-xs font-bold text-amber-500 ml-1">🔥 days</span>
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Q&A Contributions</span>
+                    <div class="flex items-baseline gap-1 mt-2">
+                        <span class="text-xl font-black font-outfit text-slate-900">{{ $stats['questions_count'] }}Q / {{ $stats['answers_count'] }}A</span>
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Brainliest Rate</span>
+                    <div class="flex items-baseline gap-1 mt-2">
+                        <span class="text-xl font-black font-outfit text-slate-900">{{ $stats['acceptance_rate'] }}%</span>
+                        <span class="text-[9px] font-bold text-slate-400 ml-1">({{ $stats['brainliest_count'] }} acc)</span>
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Appreciation</span>
+                    <div class="flex items-baseline gap-1 mt-2">
+                        <span class="text-xl font-black font-outfit text-slate-900">{{ $stats['thanks_count'] }}</span>
+                        <span class="text-[9px] font-bold text-emerald-500 ml-1">(+{{ $stats['thanks_xp_received'] }} XP)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contribution Heatmap -->
+            <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xs font-black font-outfit uppercase tracking-wider text-slate-900">Activity History</h3>
+                    <div class="flex items-center gap-1.5 text-[9px] text-slate-400 font-bold">
+                        <span>Less</span>
+                        <div class="w-2.5 h-2.5 rounded-sm bg-slate-50 border border-slate-100"></div>
+                        <div class="w-2.5 h-2.5 rounded-sm bg-emerald-100"></div>
+                        <div class="w-2.5 h-2.5 rounded-sm bg-emerald-300"></div>
+                        <div class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></div>
+                        <div class="w-2.5 h-2.5 rounded-sm bg-emerald-700"></div>
+                        <span>More</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto pb-2 scrollbar-thin">
+                    <div class="grid grid-flow-col grid-rows-7 gap-[3px] min-w-[700px] h-[95px] pr-2">
+                        @foreach($heatmapData as $item)
+                            @php
+                                $count = $item['count'];
+                                $colorClass = 'bg-slate-50 border border-slate-100';
+                                if ($count >= 10) {
+                                    $colorClass = 'bg-emerald-700';
+                                } elseif ($count >= 5) {
+                                    $colorClass = 'bg-emerald-500';
+                                } elseif ($count >= 3) {
+                                    $colorClass = 'bg-emerald-300';
+                                } elseif ($count >= 1) {
+                                    $colorClass = 'bg-emerald-100';
+                                }
+                            @endphp
+                            <div 
+                                class="w-[10px] h-[10px] rounded-[2px] transition-all hover:ring-2 hover:ring-slate-900 cursor-pointer {{ $colorClass }}" 
+                                title="{{ $count }} contribution{{ $count === 1 ? '' : 's' }} on {{ \Carbon\Carbon::parse($item['date'])->format('M d, Y') }}"
+                            ></div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-2 px-1">
+                    <span>{{ \Carbon\Carbon::parse($heatmapData[0]['date'])->format('M Y') }}</span>
+                    <span>{{ \Carbon\Carbon::now()->format('M Y') }}</span>
+                </div>
+            </div>
+
             <!-- Tabs Navigation -->
             <div class="border-b border-slate-200 flex space-x-6 overflow-x-auto">
                 <a href="{{ route('users.show', ['username' => $user->username, 'tab' => 'articles']) }}" class="pb-4 font-outfit text-sm font-bold tracking-tight border-b-2 transition-colors shrink-0 {{ $tab === 'articles' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700' }}">

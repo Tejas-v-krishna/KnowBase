@@ -601,6 +601,101 @@
                     @endif
                 </div>
 
+                {{-- WEEKLY CHALLENGES WIDGET (NEW) ─────────────────────── --}}
+                <div x-data="{
+                    challenges: [],
+                    loading: true,
+                    fetchChallenges() {
+                        fetch('{{ route('challenges.index') }}')
+                            .then(res => res.json())
+                            .then(data => {
+                                this.challenges = data;
+                                this.loading = false;
+                            });
+                    }
+                }" x-init="fetchChallenges()" class="space-y-6 border-t border-slate-100 pt-12">
+                    <div>
+                        <h2 class="text-base font-black font-outfit uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                            <span>Weekly Challenges</span>
+                            <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md text-[9px] font-black tracking-widest uppercase">Earn XP</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Complete goals before Sunday to earn bonus reputation</p>
+                    </div>
+
+                    <div x-show="loading" class="space-y-3">
+                        <div class="h-20 w-full rounded-2xl bg-slate-50 shimmer"></div>
+                        <div class="h-20 w-full rounded-2xl bg-slate-50 shimmer"></div>
+                    </div>
+
+                    <div x-show="!loading" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <template x-for="c in challenges" :key="c.id">
+                            <div class="bg-white border border-slate-100 rounded-2xl p-5 hover:border-slate-200 transition-all shadow-sm flex flex-col justify-between relative overflow-hidden"
+                                 :class="{ 'opacity-60': c.is_completed }">
+                                <div x-show="c.is_completed" class="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                                    <span class="bg-emerald-500 text-white font-bold px-3 py-1 rounded-full text-xs shadow-sm flex items-center gap-1">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        Completed
+                                    </span>
+                                </div>
+                                <div class="flex items-start gap-3 mb-4">
+                                    <div class="text-2xl" x-text="c.icon"></div>
+                                    <div>
+                                        <h3 class="text-sm font-bold text-slate-900 leading-snug" x-text="c.title"></h3>
+                                        <p class="text-xs text-slate-500 mt-0.5" x-text="c.description"></p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 mb-1">
+                                        <span x-text="c.user_progress + ' / ' + c.target_count"></span>
+                                        <span class="text-amber-500">+<span x-text="c.reward_xp"></span> XP</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-amber-500 h-full rounded-full transition-all duration-500" :style="`width: ${Math.min((c.user_progress / c.target_count) * 100, 100)}%`"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- BOUNTY BOARD WIDGET (NEW) ─────────────────────── --}}
+                @if(isset($bountyQuestions) && $bountyQuestions->isNotEmpty())
+                <div class="space-y-6 border-t border-slate-100 pt-12">
+                    <div>
+                        <h2 class="text-base font-black font-outfit uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                            <span>Bounty Board</span>
+                            <span class="h-2 w-2 rounded-full bg-rose-500 animate-pulse"></span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">High priority questions offering extra XP for the best answer</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach($bountyQuestions as $bountyQ)
+                            <div class="group bg-rose-50/30 border border-rose-100 rounded-2xl p-5 hover:bg-rose-50 hover:border-rose-200 transition-all duration-300">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-lg uppercase tracking-widest">
+                                        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        +{{ $bountyQ->bounty_amount }} XP
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ $bountyQ->topic->name ?? 'General' }}</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-900 group-hover:text-black group-hover:underline transition-colors leading-snug line-clamp-2 mb-4">
+                                    <a href="{{ route('questions.show', $bountyQ->slug) }}">{{ $bountyQ->title }}</a>
+                                </h3>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5 text-xs">
+                                        <x-user-avatar :user="$bountyQ->user" class="h-5 w-5 rounded-md" />
+                                        <span class="text-slate-500 font-semibold">{{ $bountyQ->user->name }}</span>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-slate-400">{{ $bountyQ->answers_count }} Answers</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 {{-- COMMUNITY DISCUSSIONS / ACTIVE FORUMS (NEW) ───── --}}
                 @if($threads->isNotEmpty())
                 <div class="space-y-6 border-t border-slate-100 pt-12">
@@ -871,6 +966,56 @@
                     </a>
                 </div>
                 @endif
+
+                {{-- LIVE ACTIVITY FEED WIDGET (NEW) ─────────────────────── --}}
+                <div x-data="{
+                    activities: [],
+                    loading: true,
+                    fetchActivities() {
+                        fetch('{{ route('activities.feed') }}')
+                            .then(res => res.json())
+                            .then(data => {
+                                this.activities = data;
+                                this.loading = false;
+                            });
+                    }
+                }" x-init="fetchActivities()" class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-50">
+                        <h3 class="text-xs font-black font-outfit uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                            Activity Feed
+                            <span class="flex h-2 w-2 relative">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                        </h3>
+                    </div>
+
+                    <div x-show="loading" class="space-y-4">
+                        <div class="h-10 w-full rounded-xl bg-slate-50 shimmer"></div>
+                        <div class="h-10 w-full rounded-xl bg-slate-50 shimmer"></div>
+                        <div class="h-10 w-full rounded-xl bg-slate-50 shimmer"></div>
+                    </div>
+
+                    <div x-show="!loading" style="display: none;" class="space-y-4 max-h-80 overflow-y-auto pr-2 scrollbar-thin">
+                        <template x-for="activity in activities" :key="activity.id">
+                            <div class="flex gap-3 text-sm">
+                                <template x-if="activity.user.avatar_url">
+                                    <img :src="activity.user.avatar_url" class="h-7 w-7 rounded-full object-cover shrink-0 mt-0.5">
+                                </template>
+                                <div>
+                                    <p class="text-slate-800 text-xs leading-relaxed">
+                                        <span class="font-bold text-slate-900 hover:underline cursor-pointer" x-text="activity.user.name"></span>
+                                        <span x-html="activity.description"></span>
+                                    </p>
+                                    <span class="text-[10px] font-bold text-slate-400" x-text="activity.time_ago"></span>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="activities.length === 0">
+                            <p class="text-xs text-slate-400">No recent activity.</p>
+                        </template>
+                    </div>
+                </div>
 
                 {{-- Top Contributors (Top Minds) --}}
                 <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">

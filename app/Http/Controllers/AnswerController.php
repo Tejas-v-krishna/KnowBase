@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAnswerRequest;
 use App\Models\Question;
 use App\Models\Answer;
+use App\Models\Activity;
 use App\Services\ReputationService;
 use App\Services\MentionService;
 use App\Events\QuestionAnswered;
 use App\Events\AnswerAccepted;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AnswerController extends Controller
 {
@@ -30,6 +32,15 @@ class AnswerController extends Controller
         $question->increment('answers_count');
 
         ReputationService::addPoints(auth()->user(), 5);
+
+        // Log activity
+        Activity::create([
+            'user_id' => auth()->id(),
+            'description' => 'answered: ' . Str::limit($question->title, 60),
+            'type' => 'answer_posted',
+            'subject_id' => $answer->id,
+            'subject_type' => get_class($answer),
+        ]);
 
         event(new QuestionAnswered($answer));
 
@@ -59,13 +70,33 @@ class AnswerController extends Controller
             $answer->update(['is_brainliest' => true]);
             $question->update(['accepted_answer_id' => $answer->id, 'status' => 'resolved']);
 
-            ReputationService::addPoints($answer->user, 50);
+            // Award base XP + bounty XP if applicable
+            $totalXP = 50;
+            $bountyMsg = '';
+            if ($question->bounty_amount > 0) {
+                $totalXP += $question->bounty_amount;
+                $bountyMsg = " + {$question->bounty_amount} XP bounty";
+
+                // Log bounty win activity
+                Activity::create([
+                    'user_id' => $answer->user_id,
+                    'description' => 'won a ' . $question->bounty_amount . ' XP bounty on: ' . Str::limit($question->title, 50),
+                    'type' => 'bounty_won',
+                    'subject_id' => $question->id,
+                    'subject_type' => get_class($question),
+                ]);
+            }
+
+            ReputationService::addPoints($answer->user, $totalXP);
 
             event(new AnswerAccepted($answer));
+
+            return back()->with('success', "Brainliest answer selected! Answerer earned +{$totalXP} XP{$bountyMsg}.");
         }
 
         return back()->with('success', 'Brainliest answer updated successfully.');
     }
 }
+
 
 

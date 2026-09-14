@@ -57,20 +57,46 @@
                 <p class="text-xs text-slate-500 mt-1.5 font-medium">Include details about your problem, what you tried, and any code blocks.</p>
                 <x-input-error :messages="$errors->get('body')" class="mt-1" />
             </div>
-
+            <!-- Bounty -->
+            <div x-data="{ bounty: 0, balance: {{ auth()->user()->reputation }} }">
+                <label for="bounty_amount" class="block text-sm font-bold text-slate-800">Add a Bounty (Optional)</label>
+                <p class="text-xs text-slate-500 mt-1 font-medium mb-3">Attach XP to your question to attract faster, higher-quality answers. The bounty will be deducted from your balance immediately.</p>
+                <div class="grid grid-cols-5 gap-3">
+                    <template x-for="val in [0, 25, 50, 100, 200]">
+                        <label class="relative flex flex-col items-center justify-center p-3 border rounded-xl cursor-pointer transition-all"
+                            :class="{
+                                'border-amber-500 bg-amber-50 shadow-sm': bounty === val && val > 0,
+                                'border-slate-900 bg-slate-900 text-white shadow-sm': bounty === val && val === 0,
+                                'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700': bounty !== val,
+                                'opacity-50 cursor-not-allowed': balance < (10 + val) && val > 0
+                            }">
+                            <input type="radio" name="bounty_amount" :value="val" x-model.number="bounty" class="sr-only" :disabled="balance < (10 + val) && val > 0">
+                            <span class="text-sm font-bold" x-text="val === 0 ? 'No Bounty' : '+' + val + ' XP'"></span>
+                        </label>
+                    </template>
+                </div>
+                <x-input-error :messages="$errors->get('bounty_amount')" class="mt-2" />
+                
+                <!-- Dynamic Cost Display -->
+                <div class="mt-6 flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <span class="text-sm font-bold text-slate-700">Total Cost to Ask:</span>
+                    <div class="text-right">
+                        <span class="text-lg font-black text-slate-900" x-text="(10 + bounty) + ' XP'"></span>
+                        <div class="text-xs text-slate-500 font-medium">10 XP base + <span x-text="bounty"></span> XP bounty</div>
+                    </div>
+                </div>
+            </div>
             <!-- Actions -->
             <div class="flex items-center justify-between pt-6 border-t border-slate-200">
                 <div class="flex items-center space-x-2 text-sm text-slate-500">
                     <svg class="h-5 w-5 text-slate-700" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zm7-10a1 1 0 011-1h1.5a.5.5 0 01.5.5V3.8c0 .248-.093.486-.26.657l-.872.871-3.328 3.328a1 1 0 01-1.414 0l-.707-.707a1 1 0 010-1.414l3.328-3.328.871-.872A.93.93 0 0112 2zm0 10a1 1 0 011-1h1.5a.5.5 0 01.5.5v1.3c0 .248-.093.486-.26.657l-.872.871-3.328 3.328a1 1 0 01-1.414 0l-.707-.707a1 1 0 010-1.414l3.328-3.328.871-.872A.93.93 0 0112 12z" clip-rule="evenodd"/>
                     </svg>
-                    <span>Cost: <span class="font-bold text-slate-900">-10 XP</span></span>
-                    <span class="mx-2">&bull;</span>
                     <span>Your Balance: <span class="font-bold text-slate-900">{{ auth()->user()->reputation }} XP</span></span>
                 </div>
                 <div class="flex items-center space-x-3">
                     <a href="{{ route('questions.index') }}" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm transition-all">Cancel</a>
-                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-sm" {{ auth()->user()->reputation < 10 ? 'disabled' : '' }}>
+                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-sm" :disabled="balance < (10 + bounty)">
                         Ask Question
                     </button>
                 </div>

@@ -9,6 +9,8 @@ use App\Models\Topic;
 use App\Models\User;
 use App\Models\Poll;
 use App\Models\PollVote;
+use App\Models\Activity;
+use App\Models\Challenge;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -161,6 +163,31 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
+        // Bounty Board: Open questions with active bounties
+        $bountyQuestions = Question::withBounty()
+            ->with(['user', 'topic'])
+            ->orderBy('bounty_amount', 'desc')
+            ->take(5)
+            ->get();
+
+        // Latest activities for live feed
+        $latestActivities = Activity::with('user')
+            ->latest()
+            ->take(8)
+            ->get();
+
+        // Active challenges
+        $activeChallenges = Challenge::active()->get();
+        $userChallengeProgress = [];
+        if ($user) {
+            $userChallengeProgress = $user->challenges()
+                ->wherePivotNull('completed_at')
+                ->get()
+                ->keyBy('id')
+                ->map(fn($c) => $c->pivot->progress)
+                ->toArray();
+        }
+
         return view('home.index', compact(
             'articles',
             'questions',
@@ -176,7 +203,11 @@ class HomeController extends Controller
             'userVote',
             'pollVotesCount',
             'optionVotes',
-            'expertGuides'
+            'expertGuides',
+            'bountyQuestions',
+            'latestActivities',
+            'activeChallenges',
+            'userChallengeProgress'
         ));
     }
 
